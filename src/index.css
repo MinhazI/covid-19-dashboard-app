@@ -1,13 +1,33 @@
+.ant-typography {
+
+  font-family: 'Red Hat Display', sans-serif !important;
+}
+
 body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'Red Hat Display', sans-serif !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  height: 100vh !important;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+.stats--container {
+  height: 100vh;
+}
+
+.stats--row {
+  text-align: center;
+}
+
+@media only screen and (min-width: 900px) {
+
+  .stats--row {
+    height: 50vh;
+    text-align: center;
+  }
+
 }
