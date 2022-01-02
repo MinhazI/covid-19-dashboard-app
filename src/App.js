@@ -4,6 +4,7 @@ import { getAnalytics } from "firebase/analytics";
 import { getDatabase, ref, onValue, set } from "firebase/database";
 import { Row, Col, Typography, Space, Spin } from 'antd';
 import moment from 'moment';
+import Loader from "react-loader-spinner";
 
 export default function App() {
 
@@ -123,9 +124,14 @@ export default function App() {
 
       </div>
       :
-      <Space>
-        <Spin size="large" />
-      </Space>
+      <Row justify="space-around" align="middle" className="loader--container">
+
+        <Col span={24} xs={24} lg={24} md={24}>
+          {/*<Spin size="large" tip="We are loading the stats. Please hold on. If this persists please drop us an email at hello[@]winauthority.com" />*/}
+          <Loader type="Rings" color="#013c7e" height={150} width={150} />
+          <Title level={5}>Loading...</Title>
+        </Col>
+      </Row>
   )
 
 }
