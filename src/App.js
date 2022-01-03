@@ -5,6 +5,7 @@ import { getDatabase, ref, onValue, set } from "firebase/database";
 import { Row, Col, Typography, Space, Spin } from 'antd';
 import moment from 'moment';
 import Loader from "react-loader-spinner";
+import numeral from "numeral";
 
 export default function App() {
 
@@ -62,28 +63,28 @@ export default function App() {
         <Row justify="space-around" align="middle" className="stats--row">
           <Col className="gutter-row" span={6} xs={24} lg={4} md={4}>
             <Title level={3}>Local total cases</Title>
-            <Title level={4}>{currentCovidData.local_total_cases}</Title></Col>
+            <Title level={4}>{numeral(currentCovidData.local_total_cases).format(0,0)}</Title></Col>
           <Col className="gutter-row" span={6} xs={24} lg={4} md={4}>
             <Title level={3}>Local total recovered</Title>
-            <Title level={4}>{currentCovidData.local_recovered}</Title></Col>
+            <Title level={4}>{numeral(currentCovidData.local_recovered).format(0,0)}</Title></Col>
           <Col className="gutter-row" span={6} xs={24} lg={4} md={4}>
             <Title level={3}>Local total deaths</Title>
-            <Title level={4}>{currentCovidData.local_deaths}</Title></Col>
+            <Title level={4}>{numeral(currentCovidData.local_deaths).format(0,0)}</Title></Col>
           <Col className="gutter-row" span={6} xs={24} lg={4} md={4}>
             <Title level={3}>Local active cases</Title>
-            <Title level={4}>{currentCovidData.local_active_cases}</Title>
+            <Title level={4}>{numeral(currentCovidData.local_active_cases).format(0,0)}</Title>
           </Col>
           <Col className="gutter-row" span={6} xs={24} lg={4} md={4}>
             <Title level={3}>Local new cases</Title>
-            <Title level={4}>{currentCovidData.local_new_cases}</Title></Col>
+            <Title level={4}>{numeral(currentCovidData.local_new_cases).format(0,0)}</Title></Col>
           <Col className="gutter-row" span={6} xs={24} lg={4} md={4}>
             <Title level={3}>Local new deaths</Title>
-            <Title level={4}>{currentCovidData.local_new_deaths}</Title>
+            <Title level={4}>{numeral(currentCovidData.local_new_deaths).format(0,0)}</Title>
           </Col>
         </Row>
         <Row>
           <Col className="gutter-row" span={24} xs={24} lg={24} md={24} style={{ textAlign: "center", bottom: 0 }}>
-            <Title level={5}>Last Updated: {currentCovidData.last_update}</Title>
+            <Title level={5}>Last Updated: {moment(currentCovidData.last_update).format('MMMM Do YYYY, h:mm:ss a')}</Title>
             <Title level={5}>An Innovation of Win Authority - A brand of Win Innovative Solutions (Private) Limited</Title>
             <Title level={5}>Data taken from Health Promo Bureau, Sri Lanka</Title>
           </Col>
