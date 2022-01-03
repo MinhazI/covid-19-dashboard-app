@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { initializeApp, setLogLevel } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getDatabase, ref, onValue, set } from "firebase/database";
-import { Row, Col, Typography, Space, Spin } from 'antd';
+import { Row, Col, Typography, Space, Spin, Card } from 'antd';
 import moment from 'moment';
 import Loader from "react-loader-spinner";
 import numeral from "numeral";
@@ -56,35 +56,47 @@ export default function App() {
     dataLoaded ?
       <div className="stats--container">
         <Row>
-          <Col className="gutter-row" span={24} style={{ textAlign: "center", paddingTop: 50, paddingBottom: 50 }}  >
+          <Col className="gutter-row" span={18} xs={24} md={18} lg={{span: 18}}>
             <Title level={2}>COVID-19 Sri Lanka Stats</Title>
+          </Col>
+          <Col className="gutter-row" span={6} xs={24} md={6} lg={{span: 6}}>
+            <Title level={5}>Last Updated: {moment(currentCovidData.last_update).format('MMMM Do YYYY, h:mm:ss a')}</Title>
           </Col>
         </Row>
         <Row justify="space-around" align="middle" className="stats--row">
           <Col className="gutter-row" span={6} xs={24} lg={4} md={4}>
-            <Title level={3}>Local total cases</Title>
-            <Title level={4}>{numeral(currentCovidData.local_total_cases).format(0,0)}</Title></Col>
-          <Col className="gutter-row" span={6} xs={24} lg={4} md={4}>
-            <Title level={3}>Local total recovered</Title>
-            <Title level={4}>{numeral(currentCovidData.local_recovered).format(0,0)}</Title></Col>
-          <Col className="gutter-row" span={6} xs={24} lg={4} md={4}>
-            <Title level={3}>Local total deaths</Title>
-            <Title level={4}>{numeral(currentCovidData.local_deaths).format(0,0)}</Title></Col>
-          <Col className="gutter-row" span={6} xs={24} lg={4} md={4}>
-            <Title level={3}>Local active cases</Title>
-            <Title level={4}>{numeral(currentCovidData.local_active_cases).format(0,0)}</Title>
+            <Card title="Local new cases" bordered={true}>
+              {numeral(currentCovidData.local_new_cases).format(0, 0)}
+            </Card>
           </Col>
           <Col className="gutter-row" span={6} xs={24} lg={4} md={4}>
-            <Title level={3}>Local new cases</Title>
-            <Title level={4}>{numeral(currentCovidData.local_new_cases).format(0,0)}</Title></Col>
+            <Card title="Local new deaths" bordered={true}>
+              {numeral(currentCovidData.local_new_deaths).format(0, 0)}
+            </Card>
+          </Col>
           <Col className="gutter-row" span={6} xs={24} lg={4} md={4}>
-            <Title level={3}>Local new deaths</Title>
-            <Title level={4}>{numeral(currentCovidData.local_new_deaths).format(0,0)}</Title>
+            <Card title="Local total cases" bordered={true}>
+              {numeral(currentCovidData.local_total_cases).format(0, 0)}
+            </Card>
+          </Col>
+          <Col className="gutter-row" span={6} xs={24} lg={4} md={4}>
+            <Card title="Local total recovered" bordered={true}>
+              {numeral(currentCovidData.local_recovered).format(0, 0)}
+            </Card>
+          </Col>
+          <Col className="gutter-row" span={6} xs={24} lg={4} md={4}>
+            <Card title="Local total deaths" bordered={true}>
+              {numeral(currentCovidData.local_deaths).format(0, 0)}
+            </Card>
+          </Col>
+          <Col className="gutter-row" span={6} xs={24} lg={4} md={4}>
+            <Card title="Local active cases" bordered={true}>
+              {numeral(currentCovidData.local_active_cases).format(0, 0)}
+            </Card>
           </Col>
         </Row>
         <Row>
           <Col className="gutter-row" span={24} xs={24} lg={24} md={24} style={{ textAlign: "center", bottom: 0 }}>
-            <Title level={5}>Last Updated: {moment(currentCovidData.last_update).format('MMMM Do YYYY, h:mm:ss a')}</Title>
             <Title level={5}>An Innovation of Win Authority - A brand of Win Innovative Solutions (Private) Limited</Title>
             <Title level={5}>Data taken from Health Promo Bureau, Sri Lanka</Title>
           </Col>
