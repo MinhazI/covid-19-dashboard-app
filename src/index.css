@@ -37,7 +37,7 @@ code {
   }
 
   .stats--row {
-    height: 50vh;
+    /* height: 50vh; */
     text-align: center;
   }
 }
