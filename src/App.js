@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { initializeApp, setLogLevel } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getDatabase, ref, onValue, set } from "firebase/database";
-import { Row, Col, Typography, Space, Spin, Card } from 'antd';
+import { Row, Col, Typography, Space, Spin, Card, PageHeader } from 'antd';
 import moment from 'moment';
 import Loader from "react-loader-spinner";
 import numeral from "numeral";
@@ -56,11 +56,19 @@ export default function App() {
     dataLoaded ?
       <div className="stats--container">
         <Row>
-          <Col className="gutter-row" span={18} xs={24} md={18} lg={{span: 18}}>
-            <Title level={2}>COVID-19 Sri Lanka Stats</Title>
+        <Col className="gutter-row hide-pc" span={24} xs={24} md={24} lg={24}>
+            <PageHeader
+              className="site-page-header"
+              title="COVID-19 Sri Lanka Stats"
+              footer={`Last Updated: ${moment(currentCovidData.last_update).format('MMMM Do YYYY, h:mm:ss a')}`}
+            />
           </Col>
-          <Col className="gutter-row" span={6} xs={24} md={6} lg={{span: 6}}>
-            <Title level={5}>Last Updated: {moment(currentCovidData.last_update).format('MMMM Do YYYY, h:mm:ss a')}</Title>
+          <Col className="gutter-row hide-mobile" span={24} xs={24} md={24} lg={24}>
+            <PageHeader
+              className="site-page-header"
+              title="COVID-19 Sri Lanka Stats"
+              subTitle={`Last Updated: ${moment(currentCovidData.last_update).format('MMMM Do YYYY, h:mm:ss a')}`}
+            />
           </Col>
         </Row>
         <Row justify="space-around" align="middle" className="stats--row">
