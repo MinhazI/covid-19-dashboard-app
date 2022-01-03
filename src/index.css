@@ -46,4 +46,8 @@ code {
   .hide-mobile {
       display: none !important;
   }
+
+  .stats--row{
+    margin-top: 100px
+  }
 }
