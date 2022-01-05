@@ -43,6 +43,7 @@ export default function App() {
   const [currentCovidData, setCurrentCovidData] = useState([]);
   const [allDataForCharts, setAllDataForCharts] = useState([]);
   const [totalActiveStatsForCharts, setTotalActiveStatsForCharts] = useState([]);
+  const [dailyStatsForCharts, setDailyStatsForCharts] = useState([]);
   const [startDate, setStartDate] = useState("2020-01-27");
 
   const allCovidDataFromFirebase = []
@@ -72,6 +73,10 @@ export default function App() {
     const allDates = [];
     const totalDeaths = [];
     const totalRecovered = [];
+    const newCases = [];
+    const newDeaths = [];
+    const newRecovered = [];
+
     const covidDataRef = ref(db, currentDate);
     onValue(covidDataRef, (snapshot) => {
       setCurrentCovidData(snapshot.val());
@@ -88,12 +93,23 @@ export default function App() {
           totalCases.push(ss.val().local_total_cases);
           totalDeaths.push(ss.val().local_deaths);
           totalRecovered.push(ss.val().local_recovered);
+          newCases.push(ss.val().local_new_cases);
+          newDeaths.push(ss.val().local_new_deaths);
         }
       )
 
       for (let x = 1; x <= activeCases.length - 1; x++) {
         const date = moment(startDate).add(x, 'days').format("YYYY-MM-DD")
         labels.push(date)
+      }
+
+      newRecovered.push(totalRecovered[0]);
+      for (let x = 0; x <= totalRecovered.length - 2; x++) {
+        const oldRecovery = totalRecovered[x];
+        const newRecovery = totalRecovered[x + 1];
+        const newRecoveryValue = newRecovery - oldRecovery;
+
+        newRecovered.push(newRecoveryValue);
       }
 
       const totalActiveData = {
@@ -146,7 +162,33 @@ export default function App() {
         ],
       };
 
-      setAllDataForCharts(allCovidDataForChart)
+      setAllDataForCharts(allCovidDataForChart);
+
+      const dailyStats = {
+        labels,
+        datasets: [
+          {
+            label: 'Daily Cases',
+            data: newCases,
+            borderColor: 'rgba(255, 99, 132, 0.7)',
+            backgroundColor: 'rgba(255, 99, 132, 0.5)',
+          },
+          {
+            label: 'Daily Death',
+            data: newDeaths,
+            borderColor: 'rgba(53, 162, 235, 0.7)',
+            backgroundColor: 'rgba(53, 162, 235, 0.5)',
+          },
+          {
+            label: 'Daily Recovered',
+            data: newRecovered,
+            borderColor: 'rgba(24, 165, 88, 0.7)',
+            backgroundColor: 'rgba(24, 165, 88, 0.5)',
+          }
+        ],
+      };
+
+      setDailyStatsForCharts(dailyStats);
 
       setDataLoaded(true);
     })
@@ -201,6 +243,15 @@ export default function App() {
           <Col className="gutter-row" span={6} xs={24} lg={4} md={4}>
             <Card title="Local active cases" bordered={true}>
               <Title level={2} className="stats--numbers">{numeral(currentCovidData.local_active_cases).format(0, 0)}</Title>
+            </Card>
+          </Col>
+        </Row>
+        <Row>
+          <Col className="gutter-row" align="middle" span={24} xs={24} lg={24} md={24}>
+            <Card title="Daily Stats as Graph">
+              <Col span={15} xs={24} lg={15} md={15}>
+                <Line options={options} data={dailyStatsForCharts} width={{}} />;
+              </Col>
             </Card>
           </Col>
         </Row>
