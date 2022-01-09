@@ -223,7 +223,7 @@ export default function App() {
         const date = moment().format("dddd, YYYY-MM-DD");
         const sevenDateBefore = moment(date).subtract(7, 'days').format("dddd, YYYY-MM-DD");
         const newDate = moment(sevenDateBefore).add(x, 'days').format("dddd, YYYY-MM-DD")
-        labelss.push(newDate);
+        labelss.push(String(newDate));
         // console.log("New Date: " + newDate);
       }
 
