@@ -291,7 +291,7 @@ export default function App() {
         labels: labelss,
         datasets: [
           {
-            label: 'Daily New Recovered',
+            label: 'Daily New Cases',
             data: lastSevenNewCases,
             borderColor: 'rgba(251, 171, 126, 0.7)',
             backgroundColor: 'rgba(251, 171, 126, 0.5)',
