@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import { initializeApp, setLogLevel } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getDatabase, ref, onValue, set } from "firebase/database";
-import {getPerformance} from "firebase/performance"
+import { getPerformance } from "firebase/performance"
 import { Row, Col, Typography, Space, Spin, Card, PageHeader, Tag, Button } from 'antd';
 import moment from 'moment';
 import Loader from "react-loader-spinner";
 import numeral from "numeral";
-import { Line } from 'react-chartjs-2';
+import { Bar, Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -17,6 +17,7 @@ import {
   Title,
   Tooltip,
   Legend,
+  BarElement,
 } from 'chart.js';
 import { Footer } from "antd/lib/layout/layout";
 import { isIOS } from "react-device-detect";
@@ -26,6 +27,7 @@ ChartJS.register(
   LinearScale,
   PointElement,
   LineElement,
+  BarElement,
   Title,
   Tooltip,
   Legend
@@ -62,6 +64,8 @@ export default function App() {
   const [newActiveCases, setNewActiveCases] = useState([]);
   const [newRecoveredStat, setNewRecoveredStat] = useState([]);
   const [newActiveCasesStat, setNewActiveCasesStat] = useState([]);
+  const [lastSevenDaysRecovered, setLastSevenDaysRecovered] = useState([]);
+  const [lastSevenDaysCases, setLastSevenDaysCases] = useState([]);
 
   const [statType, setStatType] = useState("Daily Statistics")
 
@@ -267,35 +271,36 @@ export default function App() {
         ],
       };
 
-
       setDailyStatisticsForCharts(dailyStats);
-      // console.log("last7Days: " + last7Labels)
 
-      // const dailyStats = {
-      //   last7Labels,
-      //   datasets: [
-      //     {
-      //       label: 'Daily Cases',
-      //       data: lastSevenNewCases,
-      //       borderColor: 'rgba(255, 99, 132, 0.7)',
-      //       backgroundColor: 'rgba(255, 99, 132, 0.5)',
-      //     },
-      //     {
-      //       label: 'Daily Death',
-      //       data: lastSevenDaysDeaths,
-      //       borderColor: 'rgba(53, 162, 235, 0.7)',
-      //       backgroundColor: 'rgba(53, 162, 235, 0.5)',
-      //     },
-      //     {
-      //       label: 'Daily Recovered',
-      //       data: lastSevenDaysRecovery,
-      //       borderColor: 'rgba(24, 165, 88, 0.7)',
-      //       backgroundColor: 'rgba(24, 165, 88, 0.5)',
-      //     }
-      //   ],
-      // };
+      const dailyRecoveryStats = {
+        labels: labelss,
+        datasets: [
+          {
+            label: 'Daily New Recovered',
+            data: lastSevenDaysRecovery,
+            borderColor: 'rgba(24, 165, 88, 0.7)',
+            backgroundColor: 'rgba(24, 165, 88, 0.5)',
+          },
 
-      // console.log("Charts thingy: " + JSON.stringify(dailyStatisticsForCharts))
+        ],
+      };
+      setLastSevenDaysRecovered(dailyRecoveryStats)
+
+      const dailyCasesStats = {
+        labels: labelss,
+        datasets: [
+          {
+            label: 'Daily New Recovered',
+            data: lastSevenNewCases,
+            borderColor: 'rgba(251, 171, 126, 0.7)',
+            backgroundColor: 'rgba(251, 171, 126, 0.5)',
+          },
+
+        ],
+      };
+      setLastSevenDaysCases(dailyCasesStats)
+
       setDataLoaded(true);
     })
   }, [])
@@ -352,7 +357,26 @@ export default function App() {
                 </Col>
               </Card>
             </Col>
-          </Row></>
+          </Row>
+          <Row>
+            <Col className="gutter-row charts-container" align="middle" span={12} xs={24} lg={12} md={12}>
+              <Card>
+                <Title level={3} className="seven-days-graphs-title">Cases Over The Last Seven (7) Days</Title>
+                <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
+                  <Bar options={options} data={lastSevenDaysCases} />;
+                </Col>
+              </Card>
+            </Col>
+            <Col className="gutter-row charts-container" align="middle" span={12} xs={24} lg={12} md={12}>
+              <Card>
+                <Title level={3} className="seven-days-graphs-title">Recoveries Over The Last Seven (7) Days</Title>
+                <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
+                  <Bar options={options} data={lastSevenDaysRecovered} />;
+                </Col>
+              </Card>
+            </Col>
+          </Row>
+        </>
           : <>
             <Row justify="space-around" align="middle" className="stats--row">
               <Col span={24} xs={24} md={24} lg={24}>
