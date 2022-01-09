@@ -18,6 +18,7 @@ import {
   Legend,
 } from 'chart.js';
 import { Footer } from "antd/lib/layout/layout";
+import { isIOS } from "react-device-detect";
 
 ChartJS.register(
   CategoryScale,
@@ -218,14 +219,26 @@ export default function App() {
 
       setAllDataForCharts(allCovidDataForChart);
 
-      labelss.length = 0;
-      for (let x = 0; x <= 6; x++) {
-        const date = moment().format("dddd, YYYY-MM-DD");
-        const sevenDateBefore = moment(date).subtract(7, 'days').format("dddd, YYYY-MM-DD");
-        const newDate = moment(sevenDateBefore).add(x, 'days').format("dddd, YYYY-MM-DD")
-        labelss.push(String(newDate));
-        // console.log("New Date: " + newDate);
+      if (isIOS) {
+        labelss.length = 0;
+        for (let x = 0; x <= 6; x++) {
+          const date = moment().format("YYYY-MM-DD");
+          const sevenDateBefore = moment(date).subtract(7, 'days').format("YYYY-MM-DD");
+          const newDate = moment(sevenDateBefore).add(x, 'days').format("YYYY-MM-DD")
+          labelss.push(String(newDate));
+          // console.log("New Date: " + newDate);
+        }
+      } else {
+        labelss.length = 0;
+        for (let x = 0; x <= 6; x++) {
+          const date = moment().format("dddd, YYYY-MM-DD");
+          const sevenDateBefore = moment(date).subtract(7, 'days').format("dddd, YYYY-MM-DD");
+          const newDate = moment(sevenDateBefore).add(x, 'days').format("dddd, YYYY-MM-DD")
+          labelss.push(String(newDate));
+          // console.log("New Date: " + newDate);
+        }
       }
+
 
       const dailyStats = {
         labels: labelss,
