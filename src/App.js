@@ -404,7 +404,7 @@ export default function App() {
         <Footer>
           <Col className="gutter-row" span={24} xs={24} lg={24} md={24} style={{ textAlign: "center", bottom: 0, paddingTop: 30 }}>
             <Title level={5}>Copyright © 2022 <a href="https://www.winauthority.com" target="_blank" rel="noreferrer">Win Innovative Solutions (Private) Limited</a></Title>
-            <Title level={5} className="footer-secondary-text">Data collected from Health Promo Bureau, Sri Lanka</Title>
+            <Title level={5} className="footer-secondary-text">Data collected from Health Promotion Bureau, Sri Lanka</Title>
           </Col>
         </Footer>
       </div>
