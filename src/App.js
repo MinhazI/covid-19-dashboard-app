@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { initializeApp, setLogLevel } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getDatabase, ref, onValue, set } from "firebase/database";
+import {getPerformance} from "firebase/performance"
 import { Row, Col, Typography, Space, Spin, Card, PageHeader, Tag, Button } from 'antd';
 import moment from 'moment';
 import Loader from "react-loader-spinner";
@@ -81,6 +82,7 @@ export default function App() {
 
   const { Title } = Typography;
   getAnalytics(app);
+  getPerformance(app);
 
 
   useEffect(() => {
