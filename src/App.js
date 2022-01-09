@@ -41,6 +41,11 @@ export const options = {
       position: 'top',
     },
   },
+  scales:{
+    y:{
+      display: true
+    }
+  }
 };
 
 export default function App() {

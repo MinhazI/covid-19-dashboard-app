@@ -132,6 +132,35 @@ span.ant-page-header-heading-tags>.ant-tag {
   font-size: 1rem;
 }
 
+.ant-tag-blue {
+  background: #28c881 !important;
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+  border-radius: 20px !important;
+  color: white !important;
+  border-color: #28c881 !important;
+  font-weight: 500
+}
+
+.ant-page-header-heading-extra > * {
+  margin-left: 0px !important;
+}
+
+.ant-page-header-heading-extra button.ant-btn.ant-btn-primary {
+  background-color: #1dc997 !important;
+  border-color: #1dc997;
+  border-radius: 20px
+}
+
+.ant-page-header-heading-extra button.ant-btn {
+  border-radius: 20px;
+  font-size: 18px;
+  padding-bottom: 33px
+}
+
+
 @media only screen and (min-width: 991px) {
   .hide-pc {
     display: none !important;
