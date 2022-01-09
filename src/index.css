@@ -193,4 +193,13 @@ span.ant-page-header-heading-tags>.ant-tag {
     /* margin-bottom: -80px; */
     align-items: center;
   }
+
+  .ant-page-header {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+
+  span.ant-tag.ant-tag-blue {
+    display: none;
+  }
 }
