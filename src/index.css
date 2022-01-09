@@ -21,19 +21,120 @@ code {
 
 .stats--row {
   text-align: center;
+  padding-top: 50px;
+  padding-bottom: 50px;
+  background-color: #96aeff;
 }
 
-.loader--container{
+.stats--row h2 {
+  padding-bottom: 20px;
+  text-transform: capitalize;
+  color: white !important;
+}
+
+
+.daily--stats--row {
+  text-align: center;
+  padding-top: 50px;
+  padding-bottom: 50px;
+  background-color: #96aeff;
+}
+
+.daily--stats--row h2 {
+  padding-bottom: 20px;
+  text-transform: capitalize;
+  color: white !important;
+}
+
+.ant-page-header-heading-sub-title {
+  background-color: #5c74c4;
+  padding: 10px;
+  border-radius: 20px;
+  color: white !important;
+  font-weight: 600;
+}
+
+.loader--container {
   height: 100vh;
 }
 
-.loader--container .ant-col{
+.loader--container .ant-col {
   text-align: center;
+}
+
+.seven-days-graphs-title {
+  padding-top: 30px;
+  padding-bottom: 30px;
+}
+
+.local-new-cases-wrapper, .local-total-cases-wrapper {
+  border-radius: 20px !important;
+  background-color: #FBAB7E !important;
+  background-image: linear-gradient(45deg, #FBAB7E 0%, #F7CE68 100%) !important;
+
+}
+
+.local-new-cases-wrapper h4, .local-new-recovered-wrapper h4, .local-new-deaths-wrapper h4, .local-total-recovered-wrapper h4, .local-total-deaths-wrapper h4, .local-total-cases-wrapper h4, .local-active-cases-wrapper h4, .local-new-active-cases-wrapper h4 {
+  text-transform: capitalize;
+  color: white !important;
+}
+
+.ant-typography {
+  font-family: 'Red Hat Display', sans-serif !important;
+}
+
+.local-new-cases-wrapper h2, .local-new-recovered-wrapper h2, .local-new-deaths-wrapper h2, .local-total-cases-wrapper h2, .local-total-deaths-wrapper h2, .local-total-recovered-wrapper h2, .local-active-cases-wrapper h2, .local-new-active-cases-wrapper h2 {
+  margin-top: 0px !important;
+  margin-bottom: 0px !important;
+  font-size: 3rem !important;
+  color: white !important
+}
+
+.local-new-recovered-wrapper, .local-total-recovered-wrapper {
+  border-radius: 20px !important;
+  background-color: #2fc770 !important;
+  background-image: linear-gradient(45deg, #2fc770 0%, #12cbb1 100%) !important;
+}
+
+.local-new-deaths-wrapper, .local-total-deaths-wrapper {
+  border-radius: 20px !important;
+  background-color: #c72f32 !important;
+  background-image: linear-gradient(45deg, #c72f32 0%, #ff7677 100%) !important;
+}
+
+.local-active-cases-wrapper, .local-new-active-cases-wrapper {
+  border-radius: 20px !important;
+  background-color: #bd419c !important;
+  background-image: linear-gradient(45deg, #bd419c 0%, #543290 100%) !important;
+
+}
+
+.ant-layout-footer a {
+  text-decoration: none !important;
+  color: black !important
+}
+
+.ant-layout-footer a:hover {
+  background-color: black;
+  color: white !important;
+  transition: 1000ms;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.charts-wrapper {
+  height: 50vh !important
+}
+
+span.ant-page-header-heading-tags>.ant-tag {
+  font-size: 1rem;
 }
 
 @media only screen and (min-width: 991px) {
   .hide-pc {
-      display: none !important;
+    display: none !important;
   }
 
   .stats--row {
@@ -44,10 +145,52 @@ code {
 
 @media only screen and (max-width: 990px) {
   .hide-mobile {
-      display: none !important;
+    display: none !important;
   }
 
-  .stats--row{
+  .stats--row {
     margin-top: 100px
+  }
+
+  .charts-wrapper {
+    height: 60vh !important
+  }
+
+  .ant-layout-footer {
+    margin-top: 80px;
+  }
+
+  .local-active-cases-wrapper, .local-new-active-cases-wrapper, .local-new-cases-wrapper, .local-new-deaths-wrapper, .local-new-recovered-wrapper, .local-total-cases-wrapper, .local-total-deaths-wrapper, .local-total-recovered-wrapper {
+    margin-left: 10px !important;
+    margin-right: 10px !important;
+    margin-bottom: 20px !important;
+  }
+
+  span.ant-page-header-heading-title {
+    min-width: max-content !important;
+    text-align: center;
+  }
+
+  span.ant-page-header-heading-sub-title {
+    min-width: max-content;
+    margin-top: 100px;
+    margin-left: -247px;
+  }
+
+  span.ant-page-header-heading-title {
+    min-width: max-content !important;
+    text-align: center;
+  }
+
+  span.ant-page-header-heading-sub-title {
+    min-width: max-content;
+    margin-top: 100px;
+    margin-left: -247px;
+  }
+
+  .ant-page-header.site-page-header.ant-page-header-ghost.ant-page-header-compact {
+    margin-top: -45px;
+    /* margin-bottom: -80px; */
+    align-items: center;
   }
 }
