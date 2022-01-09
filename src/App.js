@@ -361,7 +361,7 @@ export default function App() {
           <Row>
             <Col className="gutter-row charts-container" align="middle" span={12} xs={24} lg={12} md={12}>
               <Card>
-                <Title level={3} className="seven-days-graphs-title">Cases Over The Last Seven (7) Days</Title>
+                <Title level={3} className="seven-days-graphs-title">Daily Cases Over The Last Seven (7) Days</Title>
                 <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
                   <Bar options={options} data={lastSevenDaysCases} />;
                 </Col>
@@ -369,7 +369,7 @@ export default function App() {
             </Col>
             <Col className="gutter-row charts-container" align="middle" span={12} xs={24} lg={12} md={12}>
               <Card>
-                <Title level={3} className="seven-days-graphs-title">Recoveries Over The Last Seven (7) Days</Title>
+                <Title level={3} className="seven-days-graphs-title">Daily Recoveries Over The Last Seven (7) Days</Title>
                 <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
                   <Bar options={options} data={lastSevenDaysRecovered} />;
                 </Col>
