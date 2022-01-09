@@ -139,7 +139,6 @@ export default function App() {
         }
       }
 
-      console.log("Recovered last item: " + newRecovered.length)
 
       newActiveCases.length = 0;
       newActiveCases.push(activeCases[0]);
@@ -160,7 +159,7 @@ export default function App() {
       lastSevenDaysDeaths.length = 0
       lastSevenDaysRecovery.length = 0;
       lastSevenNewCases.length = 0
-      for (let x = totalCases.length - 7; x <= totalCases.length - 1; x++) {
+      for (let x = totalCases.length - 8; x <= totalCases.length - 2; x++) {
         lastSevenDaysDeaths.push(newDeaths[x]);
         lastSevenDaysActiveCases.push(newActiveCases[x]);
         lastSevenDaysRecovery.push(newRecovered[x]);
@@ -220,7 +219,7 @@ export default function App() {
       setAllDataForCharts(allCovidDataForChart);
 
       labelss.length = 0;
-      for (let x = 1; x <= 7; x++) {
+      for (let x = 0; x <= 6; x++) {
         const date = moment().format("dddd, YYYY-MM-DD");
         const sevenDateBefore = moment(date).subtract(7, 'days').format("dddd, YYYY-MM-DD");
         const newDate = moment(sevenDateBefore).add(x, 'days').format("dddd, YYYY-MM-DD")
