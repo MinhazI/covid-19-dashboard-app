@@ -7,7 +7,7 @@ import { Row, Col, Typography, Space, Spin, Card, PageHeader, Tag, Button } from
 import moment from 'moment';
 import Loader from "react-loader-spinner";
 import numeral from "numeral";
-import { Bar, Line } from 'react-chartjs-2';
+import { Bar, Doughnut, Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -18,6 +18,7 @@ import {
   Tooltip,
   Legend,
   BarElement,
+  ArcElement,
 } from 'chart.js';
 import { Footer } from "antd/lib/layout/layout";
 import { isIOS } from "react-device-detect";
@@ -30,7 +31,8 @@ ChartJS.register(
   BarElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  ArcElement
 );
 
 export const options = {
@@ -41,11 +43,6 @@ export const options = {
       position: 'top',
     },
   },
-  scales:{
-    y:{
-      display: true
-    }
-  }
 };
 
 export default function App() {
@@ -71,6 +68,8 @@ export default function App() {
   const [newActiveCasesStat, setNewActiveCasesStat] = useState([]);
   const [lastSevenDaysRecovered, setLastSevenDaysRecovered] = useState([]);
   const [lastSevenDaysCases, setLastSevenDaysCases] = useState([]);
+  const [lastSevenDaysDeathsForCharts, setLastSevenDaysDeathsForCharts] = useState([]);
+  const [yesterdayStatsForDoughnut, setYesterdayStatsForDoughnut] = useState([]);
 
   const [statType, setStatType] = useState("Daily Statistics")
 
@@ -119,6 +118,7 @@ export default function App() {
       totalRecovered.length = 0;
       newCases.length = 0;
       newDeaths.length = 0;
+
       snapshot.forEach(
         ss => {
           allCovidDataFromFirebase.push(ss.val());
@@ -284,13 +284,13 @@ export default function App() {
           {
             label: 'Daily New Recovered',
             data: lastSevenDaysRecovery,
-            borderColor: 'rgba(24, 165, 88, 0.7)',
-            backgroundColor: 'rgba(24, 165, 88, 0.5)',
+            borderColor: 'rgba(24, 165, 88)',
+            backgroundColor: 'rgba(24, 165, 88)',
           },
 
         ],
       };
-      setLastSevenDaysRecovered(dailyRecoveryStats)
+      setLastSevenDaysRecovered(dailyRecoveryStats);
 
       const dailyCasesStats = {
         labels: labelss,
@@ -298,13 +298,40 @@ export default function App() {
           {
             label: 'Daily New Cases',
             data: lastSevenNewCases,
-            borderColor: 'rgba(251, 171, 126, 0.7)',
-            backgroundColor: 'rgba(251, 171, 126, 0.5)',
+            borderColor: 'rgb(251, 171, 126)',
+            backgroundColor: 'rgb(251, 171, 126)',
           },
 
         ],
       };
-      setLastSevenDaysCases(dailyCasesStats)
+      setLastSevenDaysCases(dailyCasesStats);
+
+      const dailyDeathStats = {
+        labels: labelss,
+        datasets: [
+          {
+            label: 'Daily New Deaths',
+            data: lastSevenDaysDeaths,
+            borderColor: 'rgb(199, 47, 50)',
+            backgroundColor: 'rgb(199, 47, 50)',
+          },
+
+        ],
+      };
+      setLastSevenDaysDeathsForCharts(dailyDeathStats);
+
+      const yesterdayStats = {
+        labels: ["New Cases", "New Deaths", "New Recovered"],
+        datasets: [
+          {
+            label: 'Daily New Case(s)',
+            data: [lastSevenNewCases[lastSevenNewCases.length - 1], lastSevenDaysDeaths[lastSevenDaysDeaths.length - 1], lastSevenDaysRecovery[lastSevenDaysRecovery.length - 1]],
+            borderColor: ['rgba(251, 171, 126, 0.7)', 'rgba(199, 47, 50, 0.7)','rgba(24, 165, 88, 0.7)'],
+            backgroundColor: ['rgba(251, 171, 126, 0.5)','rgba(199, 47, 50, 0.5)', 'rgba(24, 165, 88, 0.5)']
+          }
+        ]
+      };
+      setYesterdayStatsForDoughnut(yesterdayStats);
 
       setDataLoaded(true);
     })
@@ -354,7 +381,15 @@ export default function App() {
             </Col>
           </Row>
           <Row>
-            <Col className="gutter-row charts-container" align="middle" span={24} xs={24} lg={24} md={24}>
+            <Col className="gutter-row charts-container" align="middle" span={8} xs={24} lg={8} md={8}>
+              <Card>
+                <Title level={3} className="seven-days-graphs-title">Yesterday Day's Statistics</Title>
+                <Col span={15} xs={24} lg={15} md={15} className="charts-wrapper">
+                  <Doughnut options={options} data={yesterdayStatsForDoughnut} />;
+                </Col>
+              </Card>
+            </Col>
+            <Col className="gutter-row charts-container" align="middle" span={16} xs={24} lg={16} md={16}>
               <Card>
                 <Title level={3} className="seven-days-graphs-title">Last Seven (7) Days Statistics in a Graph</Title>
                 <Col span={15} xs={24} lg={15} md={15} className="charts-wrapper">
@@ -364,7 +399,7 @@ export default function App() {
             </Col>
           </Row>
           <Row>
-            <Col className="gutter-row charts-container" align="middle" span={12} xs={24} lg={12} md={12}>
+            <Col className="gutter-row charts-container" align="middle" span={8} xs={24} lg={8} md={8}>
               <Card>
                 <Title level={3} className="seven-days-graphs-title">Daily Cases Over The Last Seven (7) Days</Title>
                 <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
@@ -372,11 +407,19 @@ export default function App() {
                 </Col>
               </Card>
             </Col>
-            <Col className="gutter-row charts-container" align="middle" span={12} xs={24} lg={12} md={12}>
+            <Col className="gutter-row charts-container" align="middle" span={8} xs={24} lg={8} md={8}>
               <Card>
                 <Title level={3} className="seven-days-graphs-title">Daily Recoveries Over The Last Seven (7) Days</Title>
                 <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
                   <Bar options={options} data={lastSevenDaysRecovered} />;
+                </Col>
+              </Card>
+            </Col>
+            <Col className="gutter-row charts-container" align="middle" span={8} xs={24} lg={8} md={8}>
+              <Card>
+                <Title level={3} className="seven-days-graphs-title">Daily Deaths Over The Last Seven (7) Days</Title>
+                <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
+                  <Bar options={options} data={lastSevenDaysDeathsForCharts} />;
                 </Col>
               </Card>
             </Col>
