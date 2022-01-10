@@ -384,7 +384,7 @@ export default function App() {
             <Col className="gutter-row charts-container" align="middle" span={8} xs={24} lg={8} md={8}>
               <Card>
                 <Title level={3} className="seven-days-graphs-title">Yesterday Day's Statistics</Title>
-                <Col span={15} xs={24} lg={15} md={15} className="charts-wrapper">
+                <Col span={22} xs={24} lg={22} md={22} className="charts-wrapper">
                   <Doughnut options={options} data={yesterdayStatsForDoughnut} />;
                 </Col>
               </Card>
@@ -392,7 +392,7 @@ export default function App() {
             <Col className="gutter-row charts-container" align="middle" span={16} xs={24} lg={16} md={16}>
               <Card>
                 <Title level={3} className="seven-days-graphs-title">Last Seven (7) Days Statistics in a Graph</Title>
-                <Col span={15} xs={24} lg={15} md={15} className="charts-wrapper">
+                <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
                   <Line options={options} data={dailyStatisticsForCharts} />;
                 </Col>
               </Card>
