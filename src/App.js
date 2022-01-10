@@ -242,9 +242,9 @@ export default function App() {
       } else {
         labelss.length = 0;
         for (let x = 0; x <= 6; x++) {
-          const date = moment().format("dddd, YYYY-MM-DD");
-          const sevenDateBefore = moment(date).subtract(7, 'days').format("dddd, YYYY-MM-DD");
-          const newDate = moment(sevenDateBefore).add(x, 'days').format("dddd, YYYY-MM-DD")
+          const date = moment().format("ddd, YYYY-MM-DD");
+          const sevenDateBefore = moment(date).subtract(7, 'days').format("ddd, YYYY-MM-DD");
+          const newDate = moment(sevenDateBefore).add(x, 'days').format("ddd, YYYY-MM-DD")
           labelss.push(String(newDate));
           // console.log("New Date: " + newDate);
         }
@@ -347,7 +347,7 @@ export default function App() {
               className="site-page-header"
               title="COVID-19 Sri Lanka Stats"
               tags={<Tag color="blue">{statType}</Tag>}
-              subTitle={`Last Updated: ${moment(currentCovidData.last_update).format('MMMM Do YYYY, h:mm:ss a')}`}
+              subTitle={`Last Updated: ${moment(currentCovidData.last_update).format('Do MMM YYYY, h:mm a')}`}
               extra={[
                 statType === "Daily Statistics" ? <><Button key="3" onClick={() => setStatType("Daily Statistics")} type="primary">Daily Statistics</Button>,
                   <Button key="2" onClick={() => setStatType("Total Statistics")} >Total Statistics</Button></> : <><Button key="3" onClick={() => setStatType("Daily Statistics")} >Daily Statistics</Button>,
@@ -383,7 +383,7 @@ export default function App() {
           <Row>
             <Col className="gutter-row charts-container" align="middle" span={8} xs={24} lg={8} md={8}>
               <Card>
-                <Title level={3} className="seven-days-graphs-title">Yesterday Day's Statistics</Title>
+                <Title level={3} className="seven-days-graphs-title">Yesterday's Statistics, {moment().subtract(1, "day").format("Do MMM YYYY")}</Title>
                 <Col span={22} xs={24} lg={22} md={22} className="charts-wrapper">
                   <Doughnut options={options} data={yesterdayStatsForDoughnut} />;
                 </Col>
@@ -391,7 +391,7 @@ export default function App() {
             </Col>
             <Col className="gutter-row charts-container" align="middle" span={16} xs={24} lg={16} md={16}>
               <Card>
-                <Title level={3} className="seven-days-graphs-title">Last Seven (7) Days Statistics in a Graph</Title>
+                <Title level={3} className="seven-days-graphs-title">Statistics Of The Last Seven(7) Days</Title>
                 <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
                   <Line options={options} data={dailyStatisticsForCharts} />;
                 </Col>
@@ -399,9 +399,12 @@ export default function App() {
             </Col>
           </Row>
           <Row>
+            <Col className="gutter-row" align="center" span={24} xs={24} lg={24} md={24}>
+            <Title level={3} className="seven-days-graphs-title">Statistics Of The Last Seven (7) Days</Title>
+            </Col>
             <Col className="gutter-row charts-container" align="middle" span={8} xs={24} lg={8} md={8}>
               <Card>
-                <Title level={3} className="seven-days-graphs-title">Daily Cases Over The Last Seven (7) Days</Title>
+                <Title level={3} className="seven-days-graphs-title">Daily Cases</Title>
                 <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
                   <Bar options={options} data={lastSevenDaysCases} />;
                 </Col>
@@ -409,7 +412,7 @@ export default function App() {
             </Col>
             <Col className="gutter-row charts-container" align="middle" span={8} xs={24} lg={8} md={8}>
               <Card>
-                <Title level={3} className="seven-days-graphs-title">Daily Recoveries Over The Last Seven (7) Days</Title>
+                <Title level={3} className="seven-days-graphs-title">Daily Recoveries</Title>
                 <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
                   <Bar options={options} data={lastSevenDaysRecovered} />;
                 </Col>
@@ -417,7 +420,7 @@ export default function App() {
             </Col>
             <Col className="gutter-row charts-container" align="middle" span={8} xs={24} lg={8} md={8}>
               <Card>
-                <Title level={3} className="seven-days-graphs-title">Daily Deaths Over The Last Seven (7) Days</Title>
+                <Title level={3} className="seven-days-graphs-title">Daily Deaths</Title>
                 <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
                   <Bar options={options} data={lastSevenDaysDeathsForCharts} />;
                 </Col>
