@@ -369,11 +369,11 @@ export default function App() {
                 subTitle={`Last Updated: ${moment(currentCovidData.last_update).format('Do MMM YYYY, h:mm a')}`}
                 extra={[
                   statType === "Daily Statistics" ? <>
-                    {!isIOS || !isAndroid ? <Button className="subscribe-button">Subscribe (Launching Soon)</Button> : null}
+                    {/* {!isIOS || !isAndroid ? <Button className="subscribe-button">Subscribe (Launching Soon)</Button> : null} */}
                     <Button key="3" onClick={() => setStatType("Daily Statistics")} type="primary">Daily Statistics</Button>
                     <Button key="2" onClick={() => setStatType("Total Statistics")} >Total Statistics</Button></> :
                     <>
-                    {!isIOS || !isAndroid ? <Button className="subscribe-button">Subscribe (Launching Soon)</Button> : null}
+                    {/* {!isIOS || !isAndroid ? <Button className="subscribe-button">Subscribe (Launching Soon)</Button> : null} */}
                       <Button key="3" onClick={() => setStatType("Daily Statistics")} >Daily Statistics</Button>
                       <Button key="2" onClick={() => setStatType("Total Statistics")} type="primary">Total Statistics</Button>
                     </>
