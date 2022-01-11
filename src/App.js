@@ -21,7 +21,8 @@ import {
   ArcElement,
 } from 'chart.js';
 import { Footer } from "antd/lib/layout/layout";
-import { isIOS } from "react-device-detect";
+import { isAndroid, isIOS } from "react-device-detect";
+import Modal from "antd/lib/modal/Modal";
 
 ChartJS.register(
   CategoryScale,
@@ -70,6 +71,7 @@ export default function App() {
   const [lastSevenDaysCases, setLastSevenDaysCases] = useState([]);
   const [lastSevenDaysDeathsForCharts, setLastSevenDaysDeathsForCharts] = useState([]);
   const [yesterdayStatsForDoughnut, setYesterdayStatsForDoughnut] = useState([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const [statType, setStatType] = useState("Daily Statistics")
 
@@ -86,12 +88,24 @@ export default function App() {
 
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
-  const currentDate = moment().format("YYYY-MM-DD")
+  const currentDate = moment().format("YYYY-MM-DD");
 
   const { Title } = Typography;
   getAnalytics(app);
   getPerformance(app);
 
+
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleOk = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
 
   useEffect(() => {
     const lastSevenDaysDates = [];
@@ -326,8 +340,8 @@ export default function App() {
           {
             label: 'Daily New Case(s)',
             data: [lastSevenNewCases[lastSevenNewCases.length - 1], lastSevenDaysDeaths[lastSevenDaysDeaths.length - 1], lastSevenDaysRecovery[lastSevenDaysRecovery.length - 1]],
-            borderColor: ['rgba(251, 171, 126, 0.7)', 'rgba(199, 47, 50, 0.7)','rgba(24, 165, 88, 0.7)'],
-            backgroundColor: ['rgba(251, 171, 126, 0.5)','rgba(199, 47, 50, 0.5)', 'rgba(24, 165, 88, 0.5)']
+            borderColor: ['rgba(251, 171, 126, 0.7)', 'rgba(199, 47, 50, 0.7)', 'rgba(24, 165, 88, 0.7)'],
+            backgroundColor: ['rgba(251, 171, 126, 0.5)', 'rgba(199, 47, 50, 0.5)', 'rgba(24, 165, 88, 0.5)']
           }
         ]
       };
@@ -340,156 +354,167 @@ export default function App() {
 
   return (
     dataLoaded ?
-      <div className="stats--container">
-        <Row>
-          <Col className="gutter-row" span={24} xs={24} md={24} lg={24}>
-            <PageHeader
-              className="site-page-header"
-              title="COVID-19 Sri Lanka Stats"
-              tags={<Tag color="blue">{statType}</Tag>}
-              subTitle={`Last Updated: ${moment(currentCovidData.last_update).format('Do MMM YYYY, h:mm a')}`}
-              extra={[
-                statType === "Daily Statistics" ? <><Button key="3" onClick={() => setStatType("Daily Statistics")} type="primary">Daily Statistics</Button>,
-                  <Button key="2" onClick={() => setStatType("Total Statistics")} >Total Statistics</Button></> : <><Button key="3" onClick={() => setStatType("Daily Statistics")} >Daily Statistics</Button>,
-                  <Button key="2" onClick={() => setStatType("Total Statistics")} type="primary">Total Statistics</Button></>
-              ]}
-            />
-          </Col>
-        </Row>
-        {statType === "Daily Statistics" ? <>
-          <Row justify="space-around" align="middle" className="daily--stats--row">
-            <Col span={24} xs={24} md={24} lg={24}>
-              <Title level={2}>Latest stats at a glance</Title>
-            </Col>
-            <Col className="gutter-row" span={6} xs={24} lg={4} md={4}>
-              <Card bordered={false} className="local-new-cases-wrapper">
-                <Title level={4} className="">new COVID-19 cases</Title>
-                <Title level={2} className="stats--numbers">{numeral(currentCovidData.local_new_cases).format(0, 0)}</Title>
-              </Card>
-            </Col>
-            <Col className="gutter-row" span={6} xs={24} lg={4} md={4}>
-              <Card bordered={false} className="local-new-recovered-wrapper">
-                <Title level={4}>new COVID-19 recovered</Title>
-                <Title level={2} className="stats--numbers">{numeral(newRecoveredStat).format(0, 0)}</Title>
-              </Card>
-            </Col>
-            <Col className="gutter-row" span={6} xs={24} lg={4} md={4}>
-              <Card bordered={false} className="local-new-deaths-wrapper">
-                <Title level={4}>new COVID-19 deaths</Title>
-                <Title level={2} className="stats--numbers">{numeral(currentCovidData.local_new_deaths).format(0, 0)}</Title>
-              </Card>
-            </Col>
-          </Row>
+      <>
+        <Modal title="Disclaimer" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
+          <p>The statistics that are being displayed in this dashboard are taken from Sri Lanka's Health Promotion Bureau (HPB). We, Win Innovative Solutions (Private) Limited, do not add modify the COVID-19 statistics displayed in this dashboard, nor do we take it from other sources apart from HPB as it'll be a conflict of the authenticity of the statistics.</p>
+          <p>For any concerns, please drop us an email at <a href="mailto:hello@winauthority.com?subject=COVID-19 Dashboard">hello@winauthority.com</a></p>
+        </Modal>
+        <div className="stats--container">
           <Row>
-            <Col className="gutter-row charts-container" align="middle" span={8} xs={24} lg={8} md={8}>
-              <Card>
-                <Title level={3} className="seven-days-graphs-title">Yesterday's Statistics, {moment().subtract(1, "day").format("Do MMM YYYY")}</Title>
-                <Col span={22} xs={24} lg={22} md={22} className="charts-wrapper">
-                  <Doughnut options={options} data={yesterdayStatsForDoughnut} />;
-                </Col>
-              </Card>
-            </Col>
-            <Col className="gutter-row charts-container" align="middle" span={16} xs={24} lg={16} md={16}>
-              <Card>
-                <Title level={3} className="seven-days-graphs-title">Statistics Of The Last Seven(7) Days</Title>
-                <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
-                  <Line options={options} data={dailyStatisticsForCharts} />;
-                </Col>
-              </Card>
-            </Col>
-          </Row>
-          <Row>
-            <Col className="gutter-row" align="center" span={24} xs={24} lg={24} md={24}>
-            <Title level={3} className="seven-days-graphs-title">Statistics Of The Last Seven (7) Days</Title>
-            </Col>
-            <Col className="gutter-row charts-container" align="middle" span={8} xs={24} lg={8} md={8}>
-              <Card>
-                <Title level={3} className="seven-days-graphs-title">Daily Cases</Title>
-                <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
-                  <Bar options={options} data={lastSevenDaysCases} />;
-                </Col>
-              </Card>
-            </Col>
-            <Col className="gutter-row charts-container" align="middle" span={8} xs={24} lg={8} md={8}>
-              <Card>
-                <Title level={3} className="seven-days-graphs-title">Daily Recoveries</Title>
-                <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
-                  <Bar options={options} data={lastSevenDaysRecovered} />;
-                </Col>
-              </Card>
-            </Col>
-            <Col className="gutter-row charts-container" align="middle" span={8} xs={24} lg={8} md={8}>
-              <Card>
-                <Title level={3} className="seven-days-graphs-title">Daily Deaths</Title>
-                <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
-                  <Bar options={options} data={lastSevenDaysDeathsForCharts} />;
-                </Col>
-              </Card>
+            <Col className="gutter-row" span={24} xs={24} md={24} lg={24}>
+              <PageHeader
+                className="site-page-header"
+                title="COVID-19 Sri Lanka Stats"
+                tags={<Tag color="blue">{statType}</Tag>}
+                subTitle={`Last Updated: ${moment(currentCovidData.last_update).format('Do MMM YYYY, h:mm a')}`}
+                extra={[
+                  statType === "Daily Statistics" ? <>
+                    {!isIOS || !isAndroid ? <Button className="subscribe-button">Subscribe (Launching Soon)</Button> : null}
+                    <Button key="3" onClick={() => setStatType("Daily Statistics")} type="primary">Daily Statistics</Button>
+                    <Button key="2" onClick={() => setStatType("Total Statistics")} >Total Statistics</Button></> :
+                    <>
+                    {!isIOS || !isAndroid ? <Button className="subscribe-button">Subscribe (Launching Soon)</Button> : null}
+                      <Button key="3" onClick={() => setStatType("Daily Statistics")} >Daily Statistics</Button>
+                      <Button key="2" onClick={() => setStatType("Total Statistics")} type="primary">Total Statistics</Button>
+                    </>
+                ]}
+              />
             </Col>
           </Row>
-        </>
-          : <>
-            <Row justify="space-around" align="middle" className="stats--row">
+          {statType === "Daily Statistics" ? <>
+            <Row justify="space-around" align="middle" className="daily--stats--row">
               <Col span={24} xs={24} md={24} lg={24}>
-                <Title level={2}>Total Statistics at a glance</Title>
+                <Title level={2}>Latest stats at a glance</Title>
               </Col>
               <Col className="gutter-row" span={6} xs={24} lg={4} md={4}>
-                <Card bordered={false} className="local-total-cases-wrapper">
-                  <Title level={4}>total COVID-19 cases</Title>
-                  <Title level={2} className="stats--numbers">{numeral(currentCovidData.local_total_cases).format(0, 0)}</Title>
+                <Card bordered={false} className="local-new-cases-wrapper">
+                  <Title level={4} className="">new COVID-19 cases</Title>
+                  <Title level={2} className="stats--numbers">{numeral(currentCovidData.local_new_cases).format(0, 0)}</Title>
                 </Card>
               </Col>
               <Col className="gutter-row" span={6} xs={24} lg={4} md={4}>
-                <Card bordered={false} className="local-total-recovered-wrapper">
-                  <Title level={4}>total COVID-19 recovered</Title>
-                  <Title level={2} className="stats--numbers">{numeral(currentCovidData.local_recovered).format(0, 0)}</Title>
+                <Card bordered={false} className="local-new-recovered-wrapper">
+                  <Title level={4}>new COVID-19 recovered</Title>
+                  <Title level={2} className="stats--numbers">{numeral(newRecoveredStat).format(0, 0)}</Title>
                 </Card>
               </Col>
               <Col className="gutter-row" span={6} xs={24} lg={4} md={4}>
-                <Card bordered={false} className="local-total-deaths-wrapper">
-                  <Title level={4}>total COVID-19 deaths</Title>
-                  <Title level={2} className="stats--numbers">{numeral(currentCovidData.local_deaths).format(0, 0)}</Title>
-                </Card>
-              </Col>
-              <Col className="gutter-row" span={6} xs={24} lg={4} md={4}>
-                <Card bordered={false} className="local-active-cases-wrapper">
-                  <Title level={4}>Local active cases</Title>
-                  <Title level={2} className="stats--numbers">{numeral(currentCovidData.local_active_cases).format(0, 0)}</Title>
+                <Card bordered={false} className="local-new-deaths-wrapper">
+                  <Title level={4}>new COVID-19 deaths</Title>
+                  <Title level={2} className="stats--numbers">{numeral(currentCovidData.local_new_deaths).format(0, 0)}</Title>
                 </Card>
               </Col>
             </Row>
             <Row>
-              <Col className="gutter-row" align="middle" span={12} xs={24} lg={12} md={12}>
-                <Card title="Total Statistics as Graph">
-                  <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
-                    <Line options={options} data={allDataForCharts} />;
+              <Col className="gutter-row charts-container" align="middle" span={8} xs={24} lg={8} md={8}>
+                <Card>
+                  <Title level={3} className="seven-days-graphs-title">Yesterday's Statistics, {moment().subtract(1, "day").format("Do MMM YYYY")}</Title>
+                  <Col span={22} xs={24} lg={22} md={22} className="charts-wrapper">
+                    <Doughnut options={options} data={yesterdayStatsForDoughnut} />;
                   </Col>
                 </Card>
               </Col>
-              <Col className="gutter-row charts-wrapper" align="middle" span={12} xs={24} lg={12} md={12}>
-                <Card title="Total vs Active Cases">
+              <Col className="gutter-row charts-container" align="middle" span={16} xs={24} lg={16} md={16}>
+                <Card>
+                  <Title level={3} className="seven-days-graphs-title">Statistics Of The Last Seven(7) Days</Title>
                   <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
-                    <Line options={options} data={totalActiveStatsForCharts} />;
+                    <Line options={options} data={dailyStatisticsForCharts} />;
                   </Col>
                 </Card>
               </Col>
-            </Row></>}
+            </Row>
+            <Row>
+              <Col className="gutter-row" align="center" span={24} xs={24} lg={24} md={24}>
+                <Title level={3} className="seven-days-graphs-title">Statistics Of The Last Seven (7) Days</Title>
+              </Col>
+              <Col className="gutter-row charts-container" align="middle" span={8} xs={24} lg={8} md={8}>
+                <Card>
+                  <Title level={3} className="seven-days-graphs-title">Daily Cases</Title>
+                  <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
+                    <Bar options={options} data={lastSevenDaysCases} />;
+                  </Col>
+                </Card>
+              </Col>
+              <Col className="gutter-row charts-container" align="middle" span={8} xs={24} lg={8} md={8}>
+                <Card>
+                  <Title level={3} className="seven-days-graphs-title">Daily Recoveries</Title>
+                  <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
+                    <Bar options={options} data={lastSevenDaysRecovered} />;
+                  </Col>
+                </Card>
+              </Col>
+              <Col className="gutter-row charts-container" align="middle" span={8} xs={24} lg={8} md={8}>
+                <Card>
+                  <Title level={3} className="seven-days-graphs-title">Daily Deaths</Title>
+                  <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
+                    <Bar options={options} data={lastSevenDaysDeathsForCharts} />;
+                  </Col>
+                </Card>
+              </Col>
+            </Row>
+          </>
+            : <>
+              <Row justify="space-around" align="middle" className="stats--row">
+                <Col span={24} xs={24} md={24} lg={24}>
+                  <Title level={2}>Total Statistics at a glance</Title>
+                </Col>
+                <Col className="gutter-row" span={6} xs={24} lg={4} md={4}>
+                  <Card bordered={false} className="local-total-cases-wrapper">
+                    <Title level={4}>total COVID-19 cases</Title>
+                    <Title level={2} className="stats--numbers">{numeral(currentCovidData.local_total_cases).format(0, 0)}</Title>
+                  </Card>
+                </Col>
+                <Col className="gutter-row" span={6} xs={24} lg={4} md={4}>
+                  <Card bordered={false} className="local-total-recovered-wrapper">
+                    <Title level={4}>total COVID-19 recovered</Title>
+                    <Title level={2} className="stats--numbers">{numeral(currentCovidData.local_recovered).format(0, 0)}</Title>
+                  </Card>
+                </Col>
+                <Col className="gutter-row" span={6} xs={24} lg={4} md={4}>
+                  <Card bordered={false} className="local-total-deaths-wrapper">
+                    <Title level={4}>total COVID-19 deaths</Title>
+                    <Title level={2} className="stats--numbers">{numeral(currentCovidData.local_deaths).format(0, 0)}</Title>
+                  </Card>
+                </Col>
+                <Col className="gutter-row" span={6} xs={24} lg={4} md={4}>
+                  <Card bordered={false} className="local-active-cases-wrapper">
+                    <Title level={4}>Local active cases</Title>
+                    <Title level={2} className="stats--numbers">{numeral(currentCovidData.local_active_cases).format(0, 0)}</Title>
+                  </Card>
+                </Col>
+              </Row>
+              <Row>
+                <Col className="gutter-row" align="middle" span={12} xs={24} lg={12} md={12}>
+                  <Card title="Total Statistics as Graph">
+                    <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
+                      <Line options={options} data={allDataForCharts} />;
+                    </Col>
+                  </Card>
+                </Col>
+                <Col className="gutter-row charts-wrapper" align="middle" span={12} xs={24} lg={12} md={12}>
+                  <Card title="Total vs Active Cases">
+                    <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
+                      <Line options={options} data={totalActiveStatsForCharts} />;
+                    </Col>
+                  </Card>
+                </Col>
+              </Row></>}
 
 
-        <Footer>
-          <Col className="gutter-row" span={24} xs={24} lg={24} md={24} style={{ textAlign: "center", bottom: 0, paddingTop: 30 }}>
-            <Title level={5}>Copyright © 2022 <a href="https://www.winauthority.com" target="_blank" rel="noreferrer">Win Innovative Solutions (Private) Limited</a></Title>
-            <Title level={5} className="footer-secondary-text">Data collected from Health Promotion Bureau, Sri Lanka</Title>
-          </Col>
-        </Footer>
-      </div>
+          <Footer>
+            <Col className="gutter-row" span={24} xs={24} lg={24} md={24} style={{ textAlign: "center", bottom: 0, paddingTop: 30 }}>
+              <Title level={5}>Copyright © 2022 <a href="https://www.winauthority.com" target="_blank" rel="noreferrer">Win Innovative Solutions (Private) Limited</a></Title>
+              <p className="footer-secondary-text">Data collected from Health Promotion Bureau, Sri Lanka | Got any suggestions or concerns? <a href={`https://www.winauthority.com/contact-us/?utm_source=covid-19-dashboard&utm_medium=footer-link&utm_campaign=covid-19-dashboard-footer`} target="_blank" rel="noreferrer">Contact us</a></p>
+            </Col>
+          </Footer>
+        </div></>
       :
       <Row justify="space-around" align="middle" className="loader--container">
 
         <Col span={24} xs={24} lg={24} md={24}>
           {/*<Spin size="large" tip="We are loading the stats. Please hold on. If this persists please drop us an email at hello[@]winauthority.com" />*/}
-          <Loader type="Rings" color="#013c7e" height={150} width={150} />
-          <Title level={5}>Loading...</Title>
+          <Loader type="Rings" color="#013c7e" height={200} width={200} />
+          {/* <Title level={5}>Loading...</Title> */}
         </Col>
       </Row>
   )
