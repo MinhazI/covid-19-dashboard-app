@@ -23,6 +23,7 @@ import {
 import { Footer } from "antd/lib/layout/layout";
 import { isAndroid, isIOS } from "react-device-detect";
 import Modal from "antd/lib/modal/Modal";
+import {BellOutlined} from '@ant-design/icons';
 
 ChartJS.register(
   CategoryScale,
@@ -383,7 +384,7 @@ export default function App() {
             <Row justify="space-around" align="middle" className="daily--stats--row">
               <Col span={24} xs={24} md={24} lg={24}>
                 <Title level={2}>Latest statistics at a glance</Title>
-                <Popover content={"We are launching this feature soon. Stay tuned."}><Button type="primary" className="subscribe-button" shape="round">Subscribe for daily updates</Button></Popover>
+                <Popover content={"We are launching this feature soon. Stay tuned."}><Button type="primary" className="subscribe-button" shape="round">Subscribe for daily updates<BellOutlined /></Button></Popover>
               </Col>
               <Col className="gutter-row" span={6} xs={24} lg={7} md={8}>
                 <Card bordered={false} className="local-new-cases-wrapper">
