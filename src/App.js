@@ -366,7 +366,6 @@ export default function App() {
               <PageHeader
                 className="site-page-header"
                 title="COVID-19 Sri Lanka Statistics"
-                tags={<Tag color="blue">{statType}</Tag>}
                 subTitle={`Last Updated: ${moment(currentCovidData.last_update).format('Do MMM YYYY, h:mm a')}`}
                 extra={[
                   statType === "Daily Statistics" ? <>
