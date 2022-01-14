@@ -3,7 +3,7 @@ import { initializeApp, setLogLevel } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getDatabase, ref, onValue, set } from "firebase/database";
 import { getPerformance } from "firebase/performance"
-import { Row, Col, Typography, Space, Spin, Card, PageHeader, Tag, Button } from 'antd';
+import { Row, Col, Typography, Space, Spin, Card, PageHeader, Tag, Button, Popover } from 'antd';
 import moment from 'moment';
 import Loader from "react-loader-spinner";
 import numeral from "numeral";
@@ -23,6 +23,7 @@ import {
 import { Footer } from "antd/lib/layout/layout";
 import { isAndroid, isIOS } from "react-device-detect";
 import Modal from "antd/lib/modal/Modal";
+import {BellOutlined} from '@ant-design/icons';
 
 ChartJS.register(
   CategoryScale,
@@ -364,16 +365,13 @@ export default function App() {
             <Col className="gutter-row" span={24} xs={24} md={24} lg={24}>
               <PageHeader
                 className="site-page-header"
-                title="COVID-19 Sri Lanka Stats"
-                tags={<Tag color="blue">{statType}</Tag>}
+                title="COVID-19 Sri Lanka Statistics"
                 subTitle={`Last Updated: ${moment(currentCovidData.last_update).format('Do MMM YYYY, h:mm a')}`}
                 extra={[
                   statType === "Daily Statistics" ? <>
-                    {/* {!isIOS || !isAndroid ? <Button className="subscribe-button">Subscribe (Launching Soon)</Button> : null} */}
                     <Button key="3" onClick={() => setStatType("Daily Statistics")} type="primary">Daily Statistics</Button>
                     <Button key="2" onClick={() => setStatType("Total Statistics")} >Total Statistics</Button></> :
                     <>
-                    {/* {!isIOS || !isAndroid ? <Button className="subscribe-button">Subscribe (Launching Soon)</Button> : null} */}
                       <Button key="3" onClick={() => setStatType("Daily Statistics")} >Daily Statistics</Button>
                       <Button key="2" onClick={() => setStatType("Total Statistics")} type="primary">Total Statistics</Button>
                     </>
@@ -384,21 +382,22 @@ export default function App() {
           {statType === "Daily Statistics" ? <>
             <Row justify="space-around" align="middle" className="daily--stats--row">
               <Col span={24} xs={24} md={24} lg={24}>
-                <Title level={2}>Latest stats at a glance</Title>
+                <Title level={2}>Latest statistics at a glance</Title>
+                <Popover content={"We are launching this feature soon. Stay tuned."}><Button type="primary" className="subscribe-button" shape="round">Subscribe for daily updates<BellOutlined /></Button></Popover>
               </Col>
-              <Col className="gutter-row" span={6} xs={24} lg={4} md={4}>
+              <Col className="gutter-row" span={6} xs={24} lg={7} md={8}>
                 <Card bordered={false} className="local-new-cases-wrapper">
                   <Title level={4} className="">new COVID-19 cases</Title>
                   <Title level={2} className="stats--numbers">{numeral(currentCovidData.local_new_cases).format(0, 0)}</Title>
                 </Card>
               </Col>
-              <Col className="gutter-row" span={6} xs={24} lg={4} md={4}>
+              <Col className="gutter-row" span={6} xs={24} lg={7} md={8}>
                 <Card bordered={false} className="local-new-recovered-wrapper">
                   <Title level={4}>new COVID-19 recovered</Title>
                   <Title level={2} className="stats--numbers">{numeral(newRecoveredStat).format(0, 0)}</Title>
                 </Card>
               </Col>
-              <Col className="gutter-row" span={6} xs={24} lg={4} md={4}>
+              <Col className="gutter-row" span={6} xs={24} lg={7} md={8}>
                 <Card bordered={false} className="local-new-deaths-wrapper">
                   <Title level={4}>new COVID-19 deaths</Title>
                   <Title level={2} className="stats--numbers">{numeral(currentCovidData.local_new_deaths).format(0, 0)}</Title>
