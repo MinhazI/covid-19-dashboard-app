@@ -3,7 +3,7 @@ import { initializeApp, setLogLevel } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getDatabase, ref, onValue, set } from "firebase/database";
 import { getPerformance } from "firebase/performance"
-import { Row, Col, Typography, Space, Spin, Card, PageHeader, Tag, Button, Popover } from 'antd';
+import { Row, Col, Typography, Space, Spin, Card, PageHeader, Tag, Button, Popover, Switch } from 'antd';
 import moment from 'moment';
 import Loader from "react-loader-spinner";
 import numeral from "numeral";
@@ -23,7 +23,7 @@ import {
 import { Footer } from "antd/lib/layout/layout";
 import { isAndroid, isIOS } from "react-device-detect";
 import Modal from "antd/lib/modal/Modal";
-import {BellOutlined} from '@ant-design/icons';
+import { BellOutlined } from '@ant-design/icons';
 
 ChartJS.register(
   CategoryScale,
@@ -368,13 +368,16 @@ export default function App() {
                 title="COVID-19 Sri Lanka Statistics"
                 subTitle={`Last Updated: ${moment(currentCovidData.last_update).format('Do MMM YYYY, h:mm a')}`}
                 extra={[
-                  statType === "Daily Statistics" ? <>
-                    <Button key="3" onClick={() => setStatType("Daily Statistics")} type="primary">Daily Statistics</Button>
-                    <Button key="2" onClick={() => setStatType("Total Statistics")} >Total Statistics</Button></> :
-                    <>
-                      <Button key="3" onClick={() => setStatType("Daily Statistics")} >Daily Statistics</Button>
-                      <Button key="2" onClick={() => setStatType("Total Statistics")} type="primary">Total Statistics</Button>
-                    </>
+                  // statType === "Daily Statistics" ? <>
+                  //   <Button key="3" onClick={() => setStatType("Daily Statistics")} type="primary">Daily Statistics</Button>
+                  //   <Button key="2" onClick={() => setStatType("Total Statistics")} >Total Statistics</Button></> :
+                  //   <>
+                  //     <Button key="3" onClick={() => setStatType("Daily Statistics")} >Daily Statistics</Button>
+                  //     <Button key="2" onClick={() => setStatType("Total Statistics")} type="primary">Total Statistics</Button>
+                  //   </>
+
+
+                  <Switch checkedChildren="Daily Statistics" unCheckedChildren="Total Statistics" onChange={e => e ? setStatType("Daily Statistics") : setStatType("Total Statistics")} defaultChecked/>
                 ]}
               />
             </Col>
