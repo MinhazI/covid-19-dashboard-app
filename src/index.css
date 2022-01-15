@@ -210,7 +210,7 @@ button.ant-switch {
 
 .ant-switch-handle {
   top: 8px !important;
-  left: 10px
+  left: calc(100% - 25px)
 }
 
 button.ant-switch.ant-switch-checked.ant-switch-handle {
