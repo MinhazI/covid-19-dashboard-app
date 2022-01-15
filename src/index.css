@@ -209,7 +209,7 @@ button.ant-switch {
 }
 
 .ant-switch-handle {
-  top: 8px;
+  top: 8px !important;
   left: 10px
 }
 
