@@ -214,7 +214,7 @@ button.ant-switch {
 }
 
 button.ant-switch.ant-switch-checked.ant-switch-handle {
-  top: 8px;
+  top: 8px !important;
   left: calc(100% - 18px - 10px)
 }
 
