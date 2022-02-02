@@ -118,7 +118,7 @@ export const lineChartOptions = {
 
 export let lineChartForPCRAntigen;
 
-if (isIOS && isAndroid) {
+if (isIOS || isAndroid) {
   lineChartForPCRAntigen = {
     responsive: true,
     maintainAspectRatio: false,
