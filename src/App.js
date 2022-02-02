@@ -300,6 +300,7 @@ export default function App() {
         }
       }
 
+
       if (moment(currentCovidData.last_update).format('YYYY-MM-DD') === moment().format('YYYY-MM-DD')) {
         setNewRecoveredStat(newRecovered[newRecovered.length - 1] == 0 ? newRecovered[newRecovered.length - 2] : newRecovered[newRecovered.length - 1]);
       } else {
@@ -310,8 +311,6 @@ export default function App() {
       lastSevenDaysDeaths.length = 0
       lastSevenDaysRecovery.length = 0;
       lastSevenNewCases.length = 0;
-      antigenTestLastFourteendays.length = 0;
-      PCRTestLastFourteendays.length = 0;
       for (let x = totalCases.length - 8; x <= totalCases.length - 2; x++) {
         lastSevenDaysDeaths.push(newDeaths[x]);
         lastSevenDaysActiveCases.push(newActiveCases[x]);
@@ -319,6 +318,8 @@ export default function App() {
         lastSevenNewCases.push(newCases[x]);
       }
 
+      antigenTestLastFourteendays.length = 0;
+      PCRTestLastFourteendays.length = 0;
       for (let x = newPCRTest.length - 15; x <= newPCRTest.length - 2; x++) {
         antigenTestLastFourteendays.push(newAntigenTest[x]);
         PCRTestLastFourteendays.push(newPCRTest[x]);
@@ -385,6 +386,8 @@ export default function App() {
           labelss.push(String(newDate));
           // console.log("New Date: " + newDate);
         }
+        
+        fourteenLabels.length = 0;
         for (let x = 0; x <= 13; x++) {
           const date = moment().format("YYYY-MM-DD");
           const sevenDateBefore = moment(date).subtract(14, 'days').format("YYYY-MM-DD");
@@ -402,6 +405,7 @@ export default function App() {
           // console.log("New Date: " + newDate);
         }
 
+        fourteenLabels.length = 0;
         for (let x = 0; x <= 13; x++) {
           const date = moment().format("ddd, YYYY-MM-DD");
           const sevenDateBefore = moment(date).subtract(14, 'days').format("ddd, YYYY-MM-DD");
