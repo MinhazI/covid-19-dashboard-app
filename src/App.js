@@ -24,6 +24,7 @@ import { Footer } from "antd/lib/layout/layout";
 import { isAndroid, isIOS } from "react-device-detect";
 import Modal from "antd/lib/modal/Modal";
 import { BellOutlined } from '@ant-design/icons';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 ChartJS.register(
   CategoryScale,
@@ -34,7 +35,8 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  ArcElement
+  ArcElement,
+  ChartDataLabels
 );
 
 export const options = {
@@ -44,6 +46,72 @@ export const options = {
     legend: {
       position: 'top',
     },
+    datalabels: {
+      display: true,
+      color: "black",
+      formatter: Math.round,
+      anchor: "end",
+      offset: -20,
+      align: "start"
+    }
+  },
+};
+
+export const donutChartsOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      position: 'top',
+    },
+    datalabels: {
+      display: false,
+    },
+    scales: {
+      xAxes: [{
+        gridLines: {
+          display: false
+        }
+      }],
+      yAxes: [{
+        gridLines: {
+          display: false
+        }
+      }]
+    }
+  },
+};
+
+export const lineChartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      position: 'top',
+    },
+    datalabels: {
+      display: false,
+      backgroundColor: "rgba(150, 174, 255)",
+      borderRadius: 4,
+      color: 'white',
+      font: {
+        weight: 'bold'
+      },
+      formatter: Math.round,
+      padding: 6
+    },
+    scales: {
+      xAxes: [{
+        gridLines: {
+          display: false
+        }
+      }],
+      yAxes: [{
+        gridLines: {
+          display: false
+        }
+      }]
+    }
   },
 };
 
@@ -68,9 +136,12 @@ export default function App() {
   const [newActiveCases, setNewActiveCases] = useState([]);
   const [newRecoveredStat, setNewRecoveredStat] = useState([]);
   const [newActiveCasesStat, setNewActiveCasesStat] = useState([]);
+  const [newPCRTest, setNewPCRTest] = useState([]);
+  const [newAntigenTest, setNewAntigenTest] = useState([]);
   const [lastSevenDaysRecovered, setLastSevenDaysRecovered] = useState([]);
   const [lastSevenDaysCases, setLastSevenDaysCases] = useState([]);
   const [lastSevenDaysDeathsForCharts, setLastSevenDaysDeathsForCharts] = useState([]);
+  const [PCRAntigenForCharts, setPCRAntigenForCharts] = useState([]);
   const [yesterdayStatsForDoughnut, setYesterdayStatsForDoughnut] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -114,6 +185,8 @@ export default function App() {
     const lastSevenDaysDeaths = [];
     const lastSevenDaysRecovery = [];
     const lastSevenNewCases = [];
+    const antigenTestLastFourteendays = [];
+    const PCRTestLastFourteendays = [];
 
     const covidDataRef = ref(db, currentDate);
     onValue(covidDataRef, (snapshot) => {
@@ -123,6 +196,7 @@ export default function App() {
 
     const labels = [];
     const labelss = [];
+    const fourteenLabels = [];
     const covidDataAll = ref(db);
     onValue(covidDataAll, (snapshot) => {
       allCovidDataFromFirebase.length = 0;
@@ -133,6 +207,8 @@ export default function App() {
       totalRecovered.length = 0;
       newCases.length = 0;
       newDeaths.length = 0;
+      newPCRTest.length = 0;
+      newAntigenTest.length = 0;
 
       snapshot.forEach(
         ss => {
@@ -144,6 +220,8 @@ export default function App() {
           totalRecovered.push(ss.val().local_recovered);
           newCases.push(ss.val().local_new_cases);
           newDeaths.push(ss.val().local_new_deaths);
+          newAntigenTest.push(ss.val().local_antigen_daily_test_count);
+          newPCRTest.push(ss.val().local_pcr_daily_test_count);
         }
       )
 
@@ -185,12 +263,20 @@ export default function App() {
       lastSevenDaysActiveCases.length = 0
       lastSevenDaysDeaths.length = 0
       lastSevenDaysRecovery.length = 0;
-      lastSevenNewCases.length = 0
+      lastSevenNewCases.length = 0;
+      antigenTestLastFourteendays.length = 0;
+      PCRTestLastFourteendays.length = 0;
       for (let x = totalCases.length - 8; x <= totalCases.length - 2; x++) {
         lastSevenDaysDeaths.push(newDeaths[x]);
         lastSevenDaysActiveCases.push(newActiveCases[x]);
         lastSevenDaysRecovery.push(newRecovered[x]);
         lastSevenNewCases.push(newCases[x]);
+      }
+
+      for (let x = newPCRTest.length - 15; x <= newPCRTest.length - 2; x++) {
+        antigenTestLastFourteendays.push(newAntigenTest[x]);
+        PCRTestLastFourteendays.push(newPCRTest[x]);
+        console.log("PCR: " + newPCRTest[x])
       }
 
       const totalActiveData = {
@@ -254,6 +340,13 @@ export default function App() {
           labelss.push(String(newDate));
           // console.log("New Date: " + newDate);
         }
+        for (let x = 0; x <= 13; x++) {
+          const date = moment().format("YYYY-MM-DD");
+          const sevenDateBefore = moment(date).subtract(14, 'days').format("YYYY-MM-DD");
+          const newDate = moment(sevenDateBefore).add(x, 'days').format("YYYY-MM-DD")
+          fourteenLabels.push(String(newDate));
+          // console.log("New Date: " + newDate);
+        }
       } else {
         labelss.length = 0;
         for (let x = 0; x <= 6; x++) {
@@ -262,6 +355,14 @@ export default function App() {
           const newDate = moment(sevenDateBefore).add(x, 'days').format("ddd, YYYY-MM-DD")
           labelss.push(String(newDate));
           // console.log("New Date: " + newDate);
+        }
+
+        for (let x = 0; x <= 13; x++) {
+          const date = moment().format("ddd, YYYY-MM-DD");
+          const sevenDateBefore = moment(date).subtract(14, 'days').format("ddd, YYYY-MM-DD");
+          const newDate = moment(sevenDateBefore).add(x, 'days').format("ddd, YYYY-MM-DD")
+          fourteenLabels.push(String(newDate));
+          console.log("New Date: " + newDate);
         }
       }
 
@@ -273,19 +374,19 @@ export default function App() {
             label: 'Daily New Case(s)',
             data: lastSevenNewCases,
             borderColor: 'rgba(251, 171, 126, 0.7)',
-            backgroundColor: 'rgba(251, 171, 126, 0.5)',
+            backgroundColor: 'rgba(251, 171, 126, 1)',
           },
           {
             label: 'Daily New Death(s)',
             data: lastSevenDaysDeaths,
             borderColor: 'rgba(199, 47, 50, 0.7)',
-            backgroundColor: 'rgba(199, 47, 50, 0.5)',
+            backgroundColor: 'rgba(199, 47, 50, 1)',
           },
           {
             label: 'Daily New Recovered',
             data: lastSevenDaysRecovery,
             borderColor: 'rgba(24, 165, 88, 0.7)',
-            backgroundColor: 'rgba(24, 165, 88, 0.5)',
+            backgroundColor: 'rgba(24, 165, 88, 1)',
           },
 
         ],
@@ -330,7 +431,6 @@ export default function App() {
             borderColor: 'rgb(199, 47, 50)',
             backgroundColor: 'rgb(199, 47, 50)',
           },
-
         ],
       };
       setLastSevenDaysDeathsForCharts(dailyDeathStats);
@@ -347,6 +447,26 @@ export default function App() {
         ]
       };
       setYesterdayStatsForDoughnut(yesterdayStats);
+
+      const PCRAntigenStats = {
+        labels: fourteenLabels,
+        datasets: [
+          {
+            label: 'PCR Tests',
+            data: PCRTestLastFourteendays,
+            borderColor: 'rgb(252, 107, 25, 1)',
+            backgroundColor: 'rgba(251, 171, 126, 1)',
+          },
+          {
+            label: 'Rapid Antigen Tests',
+            data: antigenTestLastFourteendays,
+            borderColor: 'rgba(150, 174, 255, 1)',
+            backgroundColor: 'rgba(150, 174, 255, 1)',
+          }
+        ],
+      };
+
+      setPCRAntigenForCharts(PCRAntigenStats);
 
       setDataLoaded(true);
     })
@@ -412,15 +532,15 @@ export default function App() {
                 <Card>
                   <Title level={3} className="seven-days-graphs-title">Yesterday's Statistics, {moment().subtract(1, "day").format("Do MMM YYYY")}</Title>
                   <Col span={22} xs={24} lg={22} md={22} className="charts-wrapper">
-                    <Doughnut options={options} data={yesterdayStatsForDoughnut} />;
+                    <Doughnut options={donutChartsOptions} data={yesterdayStatsForDoughnut} />
                   </Col>
                 </Card>
               </Col>
               <Col className="gutter-row charts-container" align="middle" span={16} xs={24} lg={16} md={16}>
                 <Card>
-                  <Title level={3} className="seven-days-graphs-title">Statistics Of The Last Seven(7) Days</Title>
+                  <Title level={3} className="seven-days-graphs-title">Summary of The Last Seven(7) Day's Statistics</Title>
                   <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
-                    <Line options={options} data={dailyStatisticsForCharts} />;
+                    <Bar options={options} data={dailyStatisticsForCharts} />
                   </Col>
                 </Card>
               </Col>
@@ -433,7 +553,7 @@ export default function App() {
                 <Card>
                   <Title level={3} className="seven-days-graphs-title">Daily Cases</Title>
                   <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
-                    <Bar options={options} data={lastSevenDaysCases} />;
+                    <Bar options={options} data={lastSevenDaysCases} />
                   </Col>
                 </Card>
               </Col>
@@ -441,7 +561,7 @@ export default function App() {
                 <Card>
                   <Title level={3} className="seven-days-graphs-title">Daily Recoveries</Title>
                   <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
-                    <Bar options={options} data={lastSevenDaysRecovered} />;
+                    <Bar options={options} data={lastSevenDaysRecovered} />
                   </Col>
                 </Card>
               </Col>
@@ -449,7 +569,19 @@ export default function App() {
                 <Card>
                   <Title level={3} className="seven-days-graphs-title">Daily Deaths</Title>
                   <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
-                    <Bar options={options} data={lastSevenDaysDeathsForCharts} />;
+                    <Bar options={options} data={lastSevenDaysDeathsForCharts} />
+                  </Col>
+                </Card>
+              </Col>
+            </Row>
+            <Row>
+              <Col className="gutter-row" align="center" span={24} xs={24} lg={24} md={24}>
+                <Title level={3} className="seven-days-graphs-title">Last Fourteen (14) Days Investigations</Title>
+              </Col>
+              <Col className="gutter-row charts-container" align="middle" span={24} xs={24} lg={24} md={24}>
+                <Card>
+                  <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
+                    <Bar options={options} data={PCRAntigenForCharts} />
                   </Col>
                 </Card>
               </Col>
@@ -489,14 +621,14 @@ export default function App() {
                 <Col className="gutter-row" align="middle" span={12} xs={24} lg={12} md={12}>
                   <Card title="Total Statistics as Graph">
                     <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
-                      <Line options={options} data={allDataForCharts} />;
+                      <Line options={lineChartOptions} data={allDataForCharts} />
                     </Col>
                   </Card>
                 </Col>
                 <Col className="gutter-row charts-wrapper" align="middle" span={12} xs={24} lg={12} md={12}>
                   <Card title="Total vs Active Cases">
                     <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
-                      <Line options={options} data={totalActiveStatsForCharts} />;
+                      <Line options={lineChartOptions} data={totalActiveStatsForCharts} />
                     </Col>
                   </Card>
                 </Col>
