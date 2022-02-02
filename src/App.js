@@ -115,6 +115,48 @@ export const lineChartOptions = {
   },
 };
 
+
+export let lineChartForPCRAntigen;
+
+if (isIOS && isAndroid) {
+  lineChartForPCRAntigen = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      datalabels: {
+        display: true,
+        color: "black",
+        formatter: Math.round,
+        anchor: "end",
+        offset: -20,
+        align: "start"
+      }
+    },
+  };
+} else {
+  lineChartForPCRAntigen = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      datalabels: {
+        display: true,
+        color: "black",
+        formatter: Math.round,
+        anchor: "end",
+        offset: -20,
+        align: "start"
+      }
+    },
+  }
+}
+
+
 export default function App() {
   const [dataLoaded, setDataLoaded] = useState(false);
   const [currentCovidData, setCurrentCovidData] = useState([]);
@@ -258,7 +300,11 @@ export default function App() {
         }
       }
 
-      setNewRecoveredStat(newRecovered[newRecovered.length - 1]);
+      if (moment(currentCovidData.last_update).format('YYYY-MM-DD') === moment().format('YYYY-MM-DD')) {
+        setNewRecoveredStat(newRecovered[newRecovered.length - 1] == 0 ? newRecovered[newRecovered.length - 2] : newRecovered[newRecovered.length - 1]);
+      } else {
+        setNewRecoveredStat(newRecovered[newRecovered.length - 1]);
+      }
       setNewActiveCasesStat(newActiveCases[newActiveCases - 1]);
       lastSevenDaysActiveCases.length = 0
       lastSevenDaysDeaths.length = 0
@@ -276,7 +322,6 @@ export default function App() {
       for (let x = newPCRTest.length - 15; x <= newPCRTest.length - 2; x++) {
         antigenTestLastFourteendays.push(newAntigenTest[x]);
         PCRTestLastFourteendays.push(newPCRTest[x]);
-        console.log("PCR: " + newPCRTest[x])
       }
 
       const totalActiveData = {
@@ -336,14 +381,14 @@ export default function App() {
         for (let x = 0; x <= 6; x++) {
           const date = moment().format("YYYY-MM-DD");
           const sevenDateBefore = moment(date).subtract(7, 'days').format("YYYY-MM-DD");
-          const newDate = moment(sevenDateBefore).add(x, 'days').format("YYYY-MM-DD")
+          const newDate = moment(sevenDateBefore).add(x, 'days').format("ddd, YYYY-MM-DD")
           labelss.push(String(newDate));
           // console.log("New Date: " + newDate);
         }
         for (let x = 0; x <= 13; x++) {
           const date = moment().format("YYYY-MM-DD");
           const sevenDateBefore = moment(date).subtract(14, 'days').format("YYYY-MM-DD");
-          const newDate = moment(sevenDateBefore).add(x, 'days').format("YYYY-MM-DD")
+          const newDate = moment(sevenDateBefore).add(x, 'days').format("ddd, YYYY-MM-DD")
           fourteenLabels.push(String(newDate));
           // console.log("New Date: " + newDate);
         }
@@ -362,7 +407,7 @@ export default function App() {
           const sevenDateBefore = moment(date).subtract(14, 'days').format("ddd, YYYY-MM-DD");
           const newDate = moment(sevenDateBefore).add(x, 'days').format("ddd, YYYY-MM-DD")
           fourteenLabels.push(String(newDate));
-          console.log("New Date: " + newDate);
+          // console.log("New Date: " + newDate);
         }
       }
 
@@ -497,7 +542,7 @@ export default function App() {
                   //   </>
 
 
-                  <Switch checkedChildren="Daily Statistics" unCheckedChildren="Total Statistics" onChange={e => e ? setStatType("Daily Statistics") : setStatType("Total Statistics")} defaultChecked/>
+                  <Switch checkedChildren="Daily Statistics" unCheckedChildren="Total Statistics" onChange={e => e ? setStatType("Daily Statistics") : setStatType("Total Statistics")} defaultChecked />
                 ]}
               />
             </Col>
@@ -581,7 +626,7 @@ export default function App() {
               <Col className="gutter-row charts-container" align="middle" span={24} xs={24} lg={24} md={24}>
                 <Card>
                   <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
-                    <Bar options={options} data={PCRAntigenForCharts} />
+                    <Bar options={lineChartForPCRAntigen} data={PCRAntigenForCharts} />
                   </Col>
                 </Card>
               </Col>
