@@ -3,7 +3,7 @@ import { initializeApp, setLogLevel } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getDatabase, ref, onValue, set } from "firebase/database";
 import { getPerformance } from "firebase/performance"
-import { Row, Col, Typography, Space, Spin, Card, PageHeader, Tag, Button, Popover, Switch } from 'antd';
+import { Row, Col, Typography, Space, Spin, Card, PageHeader, Tag, Button, Popover, Switch, Modal } from 'antd';
 import moment from 'moment';
 import Loader from "react-loader-spinner";
 import numeral from "numeral";
@@ -22,8 +22,7 @@ import {
 } from 'chart.js';
 import { Footer } from "antd/lib/layout/layout";
 import { isAndroid, isIOS } from "react-device-detect";
-import Modal from "antd/lib/modal/Modal";
-import { BellOutlined } from '@ant-design/icons';
+import { BellOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 ChartJS.register(
@@ -185,7 +184,8 @@ export default function App() {
   const [lastSevenDaysDeathsForCharts, setLastSevenDaysDeathsForCharts] = useState([]);
   const [PCRAntigenForCharts, setPCRAntigenForCharts] = useState([]);
   const [yesterdayStatsForDoughnut, setYesterdayStatsForDoughnut] = useState([]);
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [showChangelog, setShowChangelog] = useState();
+  const [isModalVisible, setIsModalVisible] = useState();
 
   const [statType, setStatType] = useState("Daily Statistics")
 
@@ -210,10 +210,11 @@ export default function App() {
 
 
   const showModal = () => {
-    setIsModalVisible(true);
+    setIsModalVisible(!showChangelog);
   };
 
   const handleOk = () => {
+    localStorage.setItem('covidstatus', "VXUeLc7R3mxB98QJZxzNNSH")
     setIsModalVisible(false);
   };
 
@@ -386,7 +387,7 @@ export default function App() {
           labelss.push(String(newDate));
           // console.log("New Date: " + newDate);
         }
-        
+
         fourteenLabels.length = 0;
         for (let x = 0; x <= 13; x++) {
           const date = moment().format("YYYY-MM-DD");
@@ -517,6 +518,20 @@ export default function App() {
 
       setPCRAntigenForCharts(PCRAntigenStats);
 
+      // setShowChangelog();
+      let showChangelog = false;
+
+      if (localStorage.getItem('covidstatus') == null) {
+        showChangelog = true;
+      } else if (localStorage.getItem('covidstatus') == "VXUeLc7R3mxB98QJZxzNNSH") {
+        showChangelog = false;
+      } else {
+        showChangelog = true;
+      }
+
+      setIsModalVisible(showChangelog);
+      // setIsModalVisible(true)
+
       setDataLoaded(true);
     })
   }, [])
@@ -525,9 +540,18 @@ export default function App() {
   return (
     dataLoaded ?
       <>
-        <Modal title="Disclaimer" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
-          <p>The statistics that are being displayed in this dashboard are taken from Sri Lanka's Health Promotion Bureau (HPB). We, Win Innovative Solutions (Private) Limited, do not add modify the COVID-19 statistics displayed in this dashboard, nor do we take it from other sources apart from HPB as it'll be a conflict of the authenticity of the statistics.</p>
-          <p>For any concerns, please drop us an email at <a href="mailto:hello@winauthority.com?subject=COVID-19 Dashboard">hello@winauthority.com</a></p>
+        <Modal title="New improvements 🥳" icon={<InfoCircleOutlined />} visible={isModalVisible} onOk={handleOk} closable={false} centered={true} cancelButtonProps={{ style: { display: 'none' } }}>
+          <p>Hey there! Thank you for using our dashboard. We hope you and your family are safe from COVID-19!</p>
+          <p>We made a few improvements to make your experience while using this dashboard better. Please find the changelog below:</p>
+          <p>
+            <ul>
+              <li>We <b>added PCR and Rapid Antigen Statistics</b>. This will now show the previous fourteen (14) days statistics</li>
+              <li>We <b>changed the button to toggle from daily statistics to total statistics to a toggle button</b> (you can view it on the top right corner)</li>
+              <li>We <b>changed the Statistics Of The Last Seven (7) Days</b> chart from a line chart to a bar chart for better viewing</li>
+              <li>We <b>added more charts</b> to the total statistics section of the dashboard to give you more understanding of the COVID-19 situation in our country</li>
+            </ul>
+          </p>
+          <p>We hope you enjoy these new changes. If you have any concerns, please drop us an email at <a href="mailto:hello@winauthority.com?subject=COVID-19 Dashboard">hello@winauthority.com</a></p>
         </Modal>
         <div className="stats--container">
           <Row>
