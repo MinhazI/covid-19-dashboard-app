@@ -214,7 +214,7 @@ export default function App() {
   };
 
   const handleOk = () => {
-    localStorage.setItem('covidstatus', "VXUeLc7R3mxB98QJZxzNNSH")
+    localStorage.setItem('covidstatus', "VXUeLc7R3mxB98QJZxzNNSHWX")
     setIsModalVisible(false);
   };
 
@@ -523,8 +523,7 @@ export default function App() {
 
       if (localStorage.getItem('covidstatus') == null) {
         showChangelog = true;
-      } else if (localStorage.getItem('covidstatus') == "VXUeLc7R3mxB98QJZxzNNSHW") {
-        localStorage.removeItem('covidstatus');
+      } else if (localStorage.getItem('covidstatus') == "VXUeLc7R3mxB98QJZxzNNSHWX") {
         showChangelog = false;
       } else {
         showChangelog = true;
@@ -544,14 +543,12 @@ export default function App() {
         <Modal title="New improvements 🥳" icon={<InfoCircleOutlined />} visible={isModalVisible} onOk={handleOk} closable={false} centered={true} cancelButtonProps={{ style: { display: 'none' } }}>
           <p>Hey there! Thank you for using our dashboard. We hope you and your family are safe from COVID-19!</p>
           <p>We made a few improvements to make your experience while using this dashboard better. Please find the changelog below:</p>
-          <p>
-            <ul>
-              <li>We <b>added PCR and Rapid Antigen Statistics</b>. This will now show the last fourteen (14) days statistics.</li>
-              <li>We <b>changed the button to a toggle, which means now you can switch between daily statistics to total statistics through a toggle button</b> (you can view it on the top right corner).</li>
-              <li>We <b>changed the Statistics Of The Last Seven (7) Days</b> chart from a line chart to a bar chart for better viewing.</li>
-              <li>We <b>added more charts</b> to the total statistics section of the dashboard to give you a better understanding of the COVID-19 situation in our country.</li>
-            </ul>
-          </p>
+          <ul>
+            <li>We <b>added PCR and Rapid Antigen Statistics</b>. This will now show the last fourteen (14) days statistics.</li>
+            <li>We <b>changed the button to a toggle, which means now you can switch between daily statistics to total statistics through a toggle button</b> (you can view it on the top right corner).</li>
+            <li>We <b>changed the Statistics Of The Last Seven (7) Days</b> chart from a line chart to a bar chart for better viewing.</li>
+            <li>We <b>added more charts</b> to the total statistics section of the dashboard to give you a better understanding of the COVID-19 situation in our country.</li>
+          </ul>
           <p>We hope you enjoy these new changes. If you have any concerns, please drop us an email at <a href="mailto:hello@winauthority.com?subject=COVID-19 Dashboard">hello@winauthority.com</a></p>
         </Modal>
         <div className="stats--container">
