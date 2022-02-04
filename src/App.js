@@ -523,7 +523,8 @@ export default function App() {
 
       if (localStorage.getItem('covidstatus') == null) {
         showChangelog = true;
-      } else if (localStorage.getItem('covidstatus') == "VXUeLc7R3mxB98QJZxzNNSH") {
+      } else if (localStorage.getItem('covidstatus') == "VXUeLc7R3mxB98QJZxzNNSHW") {
+        localStorage.removeItem('covidstatus');
         showChangelog = false;
       } else {
         showChangelog = true;
@@ -545,10 +546,10 @@ export default function App() {
           <p>We made a few improvements to make your experience while using this dashboard better. Please find the changelog below:</p>
           <p>
             <ul>
-              <li>We <b>added PCR and Rapid Antigen Statistics</b>. This will now show the previous fourteen (14) days statistics</li>
-              <li>We <b>changed the button to toggle from daily statistics to total statistics to a toggle button</b> (you can view it on the top right corner)</li>
-              <li>We <b>changed the Statistics Of The Last Seven (7) Days</b> chart from a line chart to a bar chart for better viewing</li>
-              <li>We <b>added more charts</b> to the total statistics section of the dashboard to give you more understanding of the COVID-19 situation in our country</li>
+              <li>We <b>added PCR and Rapid Antigen Statistics</b>. This will now show the last fourteen (14) days statistics.</li>
+              <li>We <b>changed the button to a toggle, which means now you can switch between daily statistics to total statistics through a toggle button</b> (you can view it on the top right corner).</li>
+              <li>We <b>changed the Statistics Of The Last Seven (7) Days</b> chart from a line chart to a bar chart for better viewing.</li>
+              <li>We <b>added more charts</b> to the total statistics section of the dashboard to give you a better understanding of the COVID-19 situation in our country.</li>
             </ul>
           </p>
           <p>We hope you enjoy these new changes. If you have any concerns, please drop us an email at <a href="mailto:hello@winauthority.com?subject=COVID-19 Dashboard">hello@winauthority.com</a></p>
