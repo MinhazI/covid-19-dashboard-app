@@ -126,7 +126,7 @@ if (isIOS || isAndroid) {
         position: 'top',
       },
       datalabels: {
-        display: true,
+        display: false,
         color: "black",
         formatter: Math.round,
         anchor: "end",
@@ -703,7 +703,17 @@ export default function App() {
                     </Col>
                   </Card>
                 </Col>
-              </Row></>}
+              </Row>
+              <Row>
+                <Col className="gutter-row charts-wrapper" align="middle" span={12} xs={24} lg={12} md={12}>
+                  <Card title="Total vs Active Cases">
+                    <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
+                      <Line options={lineChartOptions} data={totalActiveStatsForCharts} />
+                    </Col>
+                  </Card>
+                </Col>
+              </Row>
+            </>}
 
 
           <Footer>
