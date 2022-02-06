@@ -3,7 +3,7 @@ import { initializeApp, setLogLevel } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getDatabase, ref, onValue, set } from "firebase/database";
 import { getPerformance } from "firebase/performance"
-import { Row, Col, Typography, Space, Spin, Card, PageHeader, Tag, Button, Popover, Switch, Modal } from 'antd';
+import { Row, Col, Typography, Spin, Card, PageHeader, Tag, Button, Popover, Switch, Modal } from 'antd';
 import moment from 'moment';
 import Loader from "react-loader-spinner";
 import numeral from "numeral";
@@ -24,6 +24,8 @@ import { Footer } from "antd/lib/layout/layout";
 import { isAndroid, isIOS } from "react-device-detect";
 import { BellOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import { hotjar } from 'react-hotjar';
+import Tour from 'reactour'
 
 ChartJS.register(
   CategoryScale,
@@ -161,6 +163,9 @@ export default function App() {
   const [currentCovidData, setCurrentCovidData] = useState([]);
   const [allDataForCharts, setAllDataForCharts] = useState([]);
   const [totalActiveStatsForCharts, setTotalActiveStatsForCharts] = useState([]);
+  const [totalDeathRecoveredForCharts, setTotalDeathRecoveredForCharts] = useState([]);
+  const [totalCasesRecoveredForCharts, setTotalCasesRecoveredForCharts] = useState([]);
+  const [totalActiveRecoveredForCharts, setTotalActiveRecoveredForCharts] = useState([]);
   const [dailyStatsForCharts, setDailyStatsForCharts] = useState([]);
   const [startDate, setStartDate] = useState("2020-01-27");
   const [dailyStatisticsForCharts, setDailyStatisticsForCharts] = useState([])
@@ -186,6 +191,7 @@ export default function App() {
   const [yesterdayStatsForDoughnut, setYesterdayStatsForDoughnut] = useState([]);
   const [showChangelog, setShowChangelog] = useState();
   const [isModalVisible, setIsModalVisible] = useState();
+  const [isTourOpen, setIsTourOpen] = useState(true);
 
   const [statType, setStatType] = useState("Daily Statistics")
 
@@ -222,7 +228,30 @@ export default function App() {
     setIsModalVisible(false);
   };
 
+  const steps = [
+    {
+      selector: '.toggleButton',
+      content: 'Use this toggle bottom to switch between daily statistics or total statistics of COVID-19 in Sri Lanka.',
+    },
+    {
+      selector: '.ant-page-header-heading-sub-title',
+      content: 'This is the time that the statistics is last updated on.'
+    },
+    // {
+    //   selector: '.total-statistics-row',
+    //   content: 'This is where the total statistics are displayed, since the day COVID-19 started spreading in Sri Lanka'
+    // },
+    {
+      selector: '.latest-statistics-row',
+      content: 'This is where the latest statistics are displayed. Sometimes it will show the statistics of the last 24hrs till the statistics are updated. Keep an eye on the last update time.',
+    }
+  ]
+
   useEffect(() => {
+
+    hotjar.initialize(2817288, 6);
+    hotjar.identify('USER_ID', { userProperty: 'value' });
+
     const lastSevenDaysDates = [];
     const lastSevenDaysActiveCases = [];
     const lastSevenDaysDeaths = [];
@@ -332,34 +361,94 @@ export default function App() {
           {
             label: 'Active Cases',
             data: activeCases,
-            borderColor: 'rgb(255, 99, 132)',
-            backgroundColor: 'rgba(255, 99, 132, 0.5)',
+            borderColor: 'rgba(189, 65, 156, 1)',
+            backgroundColor: 'rgba(189, 65, 156, 0.5)',
           },
           {
             label: 'Total Cases',
             data: totalCases,
-            borderColor: 'rgb(53, 162, 235)',
-            backgroundColor: 'rgba(53, 162, 235, 0.5)',
+            borderColor: 'rgba(251, 171, 126)',
+            backgroundColor: 'rgba(251, 171, 126, 0.5)',
           },
         ],
       };
 
       setTotalActiveStatsForCharts(totalActiveData);
 
-      const allCovidDataForChart = {
-        labels: labels,
+      const totalRecoveredDeathsData = {
+        labels,
         datasets: [
           {
-            label: 'Active Cases',
-            data: activeCases,
-            borderColor: 'rgb(255, 99, 132)',
-            backgroundColor: 'rgba(255, 99, 132, 0.5)',
+            label: 'Recovered Cases',
+            data: totalRecovered,
+            borderColor: 'rgb(24, 165, 88)',
+            backgroundColor: 'rgba(24, 165, 88, 0.5)',
+          },
+          {
+            label: 'Total Deaths',
+            data: totalDeaths,
+            borderColor: 'rgb(199, 47, 50)',
+            backgroundColor: 'rgba(199, 47, 50, 0.5)',
+          },
+        ],
+      };
+
+      setTotalDeathRecoveredForCharts(totalRecoveredDeathsData);
+
+      const totalRecoveredTotalData = {
+        labels,
+        datasets: [
+          {
+            label: 'Recovered Cases',
+            data: totalRecovered,
+            borderColor: 'rgb(24, 165, 88)',
+            backgroundColor: 'rgba(24, 165, 88, 0.5)',
           },
           {
             label: 'Total Cases',
             data: totalCases,
-            borderColor: 'rgb(53, 162, 235)',
-            backgroundColor: 'rgba(53, 162, 235, 0.5)',
+            borderColor: 'rgba(251, 171, 126)',
+            backgroundColor: 'rgba(251, 171, 126, 0.5)',
+          },
+        ],
+      };
+
+      setTotalCasesRecoveredForCharts(totalRecoveredTotalData);
+
+      const totalActiveRecovered = {
+        labels,
+        datasets: [
+          {
+            label: 'Active Cases',
+            data: activeCases,
+            borderColor: 'rgba(189, 65, 156, 1)',
+            backgroundColor: 'rgba(189, 65, 156, 0.5)',
+          },
+          {
+            label: 'Recovered Cases',
+            data: totalRecovered,
+            borderColor: 'rgb(24, 165, 88)',
+            backgroundColor: 'rgba(24, 165, 88, 0.5)',
+          },
+        ],
+      };
+
+      setTotalActiveRecoveredForCharts(totalActiveRecovered);
+
+      const allCovidDataForChart = {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Total Cases',
+            data: totalCases,
+            borderColor: 'rgba(251, 171, 126)',
+            backgroundColor: 'rgba(251, 171, 126, 0.5)',
+          },
+          {
+            label: 'Total Recovered',
+            data: totalRecovered,
+            borderColor: 'rgb(24, 165, 88)',
+            backgroundColor: 'rgba(24, 165, 88, 0.5)',
           },
           {
             label: 'Total Death',
@@ -368,10 +457,10 @@ export default function App() {
             backgroundColor: 'rgba(199, 47, 50, 0.5)',
           },
           {
-            label: 'Total Recovered',
-            data: totalRecovered,
-            borderColor: 'rgb(24, 165, 88)',
-            backgroundColor: 'rgba(24, 165, 88, 0.5)',
+            label: 'Active Cases',
+            data: activeCases,
+            borderColor: 'rgba(189, 65, 156, 1)',
+            backgroundColor: 'rgba(189, 65, 156, 0.5)',
           }
         ],
       };
@@ -531,7 +620,6 @@ export default function App() {
 
       setIsModalVisible(showChangelog);
       // setIsModalVisible(true)
-
       setDataLoaded(true);
     })
   }, [])
@@ -568,13 +656,13 @@ export default function App() {
                   //   </>
 
 
-                  <Switch checkedChildren="Daily Statistics" unCheckedChildren="Total Statistics" onChange={e => e ? setStatType("Daily Statistics") : setStatType("Total Statistics")} defaultChecked />
+                  <Switch className="toggleButton" checkedChildren="Daily Statistics" unCheckedChildren="Total Statistics" onChange={e => e ? setStatType("Daily Statistics") : setStatType("Total Statistics")} defaultChecked />
                 ]}
               />
             </Col>
           </Row>
           {statType === "Daily Statistics" ? <>
-            <Row justify="space-around" align="middle" className="daily--stats--row">
+            <Row justify="space-around latest-statistics-row" align="middle" className="daily--stats--row">
               <Col span={24} xs={24} md={24} lg={24}>
                 <Title level={2}>Latest statistics at a glance</Title>
                 <Popover content={"We are launching this feature soon. Stay tuned."}><Button type="primary" className="subscribe-button" shape="round">Subscribe for daily updates<BellOutlined /></Button></Popover>
@@ -659,7 +747,7 @@ export default function App() {
             </Row>
           </>
             : <>
-              <Row justify="space-around" align="middle" className="stats--row">
+              <Row justify="space-around total-statistics-row" align="middle" className="stats--row">
                 <Col span={24} xs={24} md={24} lg={24}>
                   <Title level={2}>Total Statistics at a glance</Title>
                 </Col>
@@ -689,32 +777,47 @@ export default function App() {
                 </Col>
               </Row>
               <Row>
-                <Col className="gutter-row" align="middle" span={12} xs={24} lg={12} md={12}>
+                <Col className="gutter-row" align="middle" span={24} xs={24} lg={24} md={24}>
                   <Card title="Total Statistics as Graph">
                     <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
                       <Line options={lineChartOptions} data={allDataForCharts} />
                     </Col>
                   </Card>
                 </Col>
-                <Col className="gutter-row charts-wrapper" align="middle" span={12} xs={24} lg={12} md={12}>
+              </Row>
+              <Row>
+                <Col className="gutter-row" align="center" span={12} xs={24} lg={12} md={12}>
                   <Card title="Total vs Active Cases">
                     <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
                       <Line options={lineChartOptions} data={totalActiveStatsForCharts} />
+                    </Col>
+                  </Card>
+                </Col>
+                <Col className="gutter-row" align="center" span={12} xs={24} lg={12} md={12}>
+                  <Card title="Recovered vs Death Cases">
+                    <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
+                      <Line options={lineChartOptions} data={totalDeathRecoveredForCharts} />
                     </Col>
                   </Card>
                 </Col>
               </Row>
               <Row>
-                <Col className="gutter-row charts-wrapper" align="middle" span={12} xs={24} lg={12} md={12}>
-                  <Card title="Total vs Active Cases">
+                <Col className="gutter-row" align="center" span={12} xs={24} lg={12} md={12}>
+                  <Card title="Recovered vs Total Cases">
                     <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
-                      <Line options={lineChartOptions} data={totalActiveStatsForCharts} />
+                      <Line options={lineChartOptions} data={totalCasesRecoveredForCharts} />
+                    </Col>
+                  </Card>
+                </Col>
+                <Col className="gutter-row" align="center" span={12} xs={24} lg={12} md={12}>
+                  <Card title="Active vs Recovered Cases">
+                    <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
+                      <Line options={lineChartOptions} data={totalActiveRecoveredForCharts} />
                     </Col>
                   </Card>
                 </Col>
               </Row>
             </>}
-
 
           <Footer>
             <Col className="gutter-row" span={24} xs={24} lg={24} md={24} style={{ textAlign: "center", bottom: 0, paddingTop: 30 }}>
@@ -722,7 +825,18 @@ export default function App() {
               <p className="footer-secondary-text">Data collected from Health Promotion Bureau, Sri Lanka | Got any suggestions or concerns? <a href={`https://www.winauthority.com/contact-us/?utm_source=covid-19-dashboard&utm_medium=footer-link&utm_campaign=covid-19-dashboard-footer`} target="_blank" rel="noreferrer">Contact us</a></p>
             </Col>
           </Footer>
-        </div></>
+        </div>
+
+        <Tour
+          steps={steps}
+          isOpen={isTourOpen}
+          onRequestClose={() => setIsTourOpen(false)}
+          disableKeyboardNavigation={true}
+          lastStepNextButton={<Button type="primary" onClick={() => setIsTourOpen(false)}>Hide</Button>}
+          accentColor="#96aeff"
+          showNavigation={false}
+        />
+      </>
       :
       <Row justify="space-around" align="middle" className="loader--container">
 
@@ -732,6 +846,7 @@ export default function App() {
           {/* <Title level={5}>Loading...</Title> */}
         </Col>
       </Row>
+
   )
 
 }
