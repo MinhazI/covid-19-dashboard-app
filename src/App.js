@@ -191,7 +191,7 @@ export default function App() {
   const [yesterdayStatsForDoughnut, setYesterdayStatsForDoughnut] = useState([]);
   const [showChangelog, setShowChangelog] = useState();
   const [isModalVisible, setIsModalVisible] = useState();
-  const [isTourOpen, setIsTourOpen] = useState(true);
+  const [isTourOpen, setIsTourOpen] = useState();
 
   const [statType, setStatType] = useState("Daily Statistics")
 
@@ -220,9 +220,15 @@ export default function App() {
   };
 
   const handleOk = () => {
-    localStorage.setItem('covidstatus', "VXUeLc7R3mxB98QJZxzNNSHWX")
+    localStorage.setItem('covidstats', "VXUeLc7R3mxB98QJZxzNNSHWX");
     setIsModalVisible(false);
+    setIsTourOpen(true);
   };
+
+  const handleHide = () => {
+    localStorage.setItem('@covidstats/wdr-frg', 'hcSFHrPBQ8qs3BjE');
+    setIsTourOpen(false);
+  }
 
   const handleCancel = () => {
     setIsModalVisible(false);
@@ -231,11 +237,11 @@ export default function App() {
   const steps = [
     {
       selector: '.toggleButton',
-      content: 'Use this toggle bottom to switch between daily statistics or total statistics of COVID-19 in Sri Lanka.',
+      content: 'Use this toggle botton to switch between daily statistics or total statistics of COVID-19 in Sri Lanka.',
     },
     {
       selector: '.ant-page-header-heading-sub-title',
-      content: 'This is the time that the statistics is last updated on.'
+      content: 'This shows the time that the statistics is last updated on.'
     },
     // {
     //   selector: '.total-statistics-row',
@@ -610,10 +616,13 @@ export default function App() {
       // setShowChangelog();
       let showChangelog = false;
 
-      if (localStorage.getItem('covidstatus') == null) {
+      if (localStorage.getItem('covidstats') == null) {
         showChangelog = true;
-      } else if (localStorage.getItem('covidstatus') == "VXUeLc7R3mxB98QJZxzNNSHWX") {
+      } else if (localStorage.getItem('covidstats') == "VXUeLc7R3mxB98QJZxzNNSHWX") {
         showChangelog = false;
+        if (localStorage.getItem('@covidstats/wdr-frg') == null) {
+          setIsTourOpen(true);
+        }
       } else {
         showChangelog = true;
       }
@@ -830,7 +839,7 @@ export default function App() {
         <Tour
           steps={steps}
           isOpen={isTourOpen}
-          onRequestClose={() => setIsTourOpen(false)}
+          onRequestClose={() => handleHide()}
           disableKeyboardNavigation={true}
           lastStepNextButton={<Button type="primary" onClick={() => setIsTourOpen(false)}>Hide</Button>}
           accentColor="#96aeff"
