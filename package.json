@@ -8,6 +8,7 @@
     "@testing-library/user-event": "^13.5.0",
     "antd": "^4.18.2",
     "chart.js": "^3.7.0",
+    "chartjs-plugin-datalabels": "^2.0.0",
     "faker": "^5.5.3",
     "firebase": "^9.6.1",
     "moment": "^2.29.1",
@@ -16,8 +17,11 @@
     "react-chartjs-2": "^4.0.0",
     "react-device-detect": "^2.1.2",
     "react-dom": "^17.0.2",
+    "react-hotjar": "^4.0.0",
     "react-loader-spinner": "^4.0.0",
     "react-scripts": "5.0.0",
+    "reactour": "^1.18.7",
+    "styled-components": "^4.0.0",
     "web-vitals": "^2.1.2"
   },
   "scripts": {

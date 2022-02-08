@@ -185,6 +185,40 @@ span.ant-page-header-heading-tags>.ant-tag {
   border-color: #5c74c4;
 }
 
+button.ant-switch.ant-switch-checked {
+  background: #18caa3;
+}
+
+button.ant-switch.ant-switch-checked .ant-switch-inner {
+  color: white;
+  font-weight: 500
+}
+
+.ant-switch-inner {
+  font-size: 15px !important;
+}
+
+button.ant-switch {
+  height: 35px !important;
+  width: 150px;
+}
+
+.ant-switch-inner {
+  color: black;
+  font-weight: 500
+}
+
+.ant-switch-handle {
+  top: 8px !important;
+  left: 10px !important
+}
+
+button.ant-switch.ant-switch-checked .ant-switch-handle {
+  top: 8px !important;
+  left: calc(100% - 18px - 10px) !important
+}
+
+
 
 @media only screen and (min-width: 991px) {
   .hide-pc {

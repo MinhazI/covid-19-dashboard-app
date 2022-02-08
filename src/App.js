@@ -3,7 +3,7 @@ import { initializeApp, setLogLevel } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getDatabase, ref, onValue, set } from "firebase/database";
 import { getPerformance } from "firebase/performance"
-import { Row, Col, Typography, Space, Spin, Card, PageHeader, Tag, Button, Popover } from 'antd';
+import { Row, Col, Typography, Spin, Card, PageHeader, Tag, Button, Popover, Switch, Modal } from 'antd';
 import moment from 'moment';
 import Loader from "react-loader-spinner";
 import numeral from "numeral";
@@ -22,8 +22,10 @@ import {
 } from 'chart.js';
 import { Footer } from "antd/lib/layout/layout";
 import { isAndroid, isIOS } from "react-device-detect";
-import Modal from "antd/lib/modal/Modal";
-import {BellOutlined} from '@ant-design/icons';
+import { BellOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+import { hotjar } from 'react-hotjar';
+import Tour from 'reactour'
 
 ChartJS.register(
   CategoryScale,
@@ -34,7 +36,8 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  ArcElement
+  ArcElement,
+  ChartDataLabels
 );
 
 export const options = {
@@ -44,14 +47,125 @@ export const options = {
     legend: {
       position: 'top',
     },
+    datalabels: {
+      display: true,
+      color: "black",
+      formatter: Math.round,
+      anchor: "end",
+      offset: -20,
+      align: "start"
+    }
   },
 };
+
+export const donutChartsOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      position: 'top',
+    },
+    datalabels: {
+      display: false,
+    },
+    scales: {
+      xAxes: [{
+        gridLines: {
+          display: false
+        }
+      }],
+      yAxes: [{
+        gridLines: {
+          display: false
+        }
+      }]
+    }
+  },
+};
+
+export const lineChartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      position: 'top',
+    },
+    datalabels: {
+      display: false,
+      backgroundColor: "rgba(150, 174, 255)",
+      borderRadius: 4,
+      color: 'white',
+      font: {
+        weight: 'bold'
+      },
+      formatter: Math.round,
+      padding: 6
+    },
+    scales: {
+      xAxes: [{
+        gridLines: {
+          display: false
+        }
+      }],
+      yAxes: [{
+        gridLines: {
+          display: false
+        }
+      }]
+    }
+  },
+};
+
+
+export let lineChartForPCRAntigen;
+
+if (isIOS || isAndroid) {
+  lineChartForPCRAntigen = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      datalabels: {
+        display: false,
+        color: "black",
+        formatter: Math.round,
+        anchor: "end",
+        offset: -20,
+        align: "start"
+      }
+    },
+  };
+} else {
+  lineChartForPCRAntigen = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      datalabels: {
+        display: true,
+        color: "black",
+        formatter: Math.round,
+        anchor: "end",
+        offset: -20,
+        align: "start"
+      }
+    },
+  }
+}
+
 
 export default function App() {
   const [dataLoaded, setDataLoaded] = useState(false);
   const [currentCovidData, setCurrentCovidData] = useState([]);
   const [allDataForCharts, setAllDataForCharts] = useState([]);
   const [totalActiveStatsForCharts, setTotalActiveStatsForCharts] = useState([]);
+  const [totalDeathRecoveredForCharts, setTotalDeathRecoveredForCharts] = useState([]);
+  const [totalCasesRecoveredForCharts, setTotalCasesRecoveredForCharts] = useState([]);
+  const [totalActiveRecoveredForCharts, setTotalActiveRecoveredForCharts] = useState([]);
   const [dailyStatsForCharts, setDailyStatsForCharts] = useState([]);
   const [startDate, setStartDate] = useState("2020-01-27");
   const [dailyStatisticsForCharts, setDailyStatisticsForCharts] = useState([])
@@ -68,11 +182,16 @@ export default function App() {
   const [newActiveCases, setNewActiveCases] = useState([]);
   const [newRecoveredStat, setNewRecoveredStat] = useState([]);
   const [newActiveCasesStat, setNewActiveCasesStat] = useState([]);
+  const [newPCRTest, setNewPCRTest] = useState([]);
+  const [newAntigenTest, setNewAntigenTest] = useState([]);
   const [lastSevenDaysRecovered, setLastSevenDaysRecovered] = useState([]);
   const [lastSevenDaysCases, setLastSevenDaysCases] = useState([]);
   const [lastSevenDaysDeathsForCharts, setLastSevenDaysDeathsForCharts] = useState([]);
+  const [PCRAntigenForCharts, setPCRAntigenForCharts] = useState([]);
   const [yesterdayStatsForDoughnut, setYesterdayStatsForDoughnut] = useState([]);
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [showChangelog, setShowChangelog] = useState();
+  const [isModalVisible, setIsModalVisible] = useState();
+  const [isTourOpen, setIsTourOpen] = useState();
 
   const [statType, setStatType] = useState("Daily Statistics")
 
@@ -97,23 +216,55 @@ export default function App() {
 
 
   const showModal = () => {
-    setIsModalVisible(true);
+    setIsModalVisible(!showChangelog);
   };
 
   const handleOk = () => {
+    localStorage.setItem('covidstats', "VXUeLc7R3mxB98QJZxzNNSHWX");
     setIsModalVisible(false);
+    setIsTourOpen(true);
   };
+
+  const handleHide = () => {
+    localStorage.setItem('@covidstats/wdr-frg', 'hcSFHrPBQ8qs3BjE');
+    setIsTourOpen(false);
+  }
 
   const handleCancel = () => {
     setIsModalVisible(false);
   };
 
+  const steps = [
+    {
+      selector: '.toggleButton',
+      content: 'Use this toggle botton to switch between daily statistics or total statistics of COVID-19 in Sri Lanka.',
+    },
+    {
+      selector: '.ant-page-header-heading-sub-title',
+      content: 'This shows the time that the statistics is last updated on.'
+    },
+    // {
+    //   selector: '.total-statistics-row',
+    //   content: 'This is where the total statistics are displayed, since the day COVID-19 started spreading in Sri Lanka'
+    // },
+    {
+      selector: '.latest-statistics-row',
+      content: 'This is where the latest statistics are displayed. Sometimes it will show the statistics of the last 24hrs till the statistics are updated. Keep an eye on the last update time.',
+    }
+  ]
+
   useEffect(() => {
+
+    hotjar.initialize(2817288, 6);
+    hotjar.identify('USER_ID', { userProperty: 'value' });
+
     const lastSevenDaysDates = [];
     const lastSevenDaysActiveCases = [];
     const lastSevenDaysDeaths = [];
     const lastSevenDaysRecovery = [];
     const lastSevenNewCases = [];
+    const antigenTestLastFourteendays = [];
+    const PCRTestLastFourteendays = [];
 
     const covidDataRef = ref(db, currentDate);
     onValue(covidDataRef, (snapshot) => {
@@ -123,6 +274,7 @@ export default function App() {
 
     const labels = [];
     const labelss = [];
+    const fourteenLabels = [];
     const covidDataAll = ref(db);
     onValue(covidDataAll, (snapshot) => {
       allCovidDataFromFirebase.length = 0;
@@ -133,6 +285,8 @@ export default function App() {
       totalRecovered.length = 0;
       newCases.length = 0;
       newDeaths.length = 0;
+      newPCRTest.length = 0;
+      newAntigenTest.length = 0;
 
       snapshot.forEach(
         ss => {
@@ -144,6 +298,8 @@ export default function App() {
           totalRecovered.push(ss.val().local_recovered);
           newCases.push(ss.val().local_new_cases);
           newDeaths.push(ss.val().local_new_deaths);
+          newAntigenTest.push(ss.val().local_antigen_daily_test_count);
+          newPCRTest.push(ss.val().local_pcr_daily_test_count);
         }
       )
 
@@ -180,17 +336,29 @@ export default function App() {
         }
       }
 
-      setNewRecoveredStat(newRecovered[newRecovered.length - 1]);
+
+      if (moment(currentCovidData.last_update).format('YYYY-MM-DD') === moment().format('YYYY-MM-DD')) {
+        setNewRecoveredStat(newRecovered[newRecovered.length - 1] == 0 ? newRecovered[newRecovered.length - 2] : newRecovered[newRecovered.length - 1]);
+      } else {
+        setNewRecoveredStat(newRecovered[newRecovered.length - 1]);
+      }
       setNewActiveCasesStat(newActiveCases[newActiveCases - 1]);
       lastSevenDaysActiveCases.length = 0
       lastSevenDaysDeaths.length = 0
       lastSevenDaysRecovery.length = 0;
-      lastSevenNewCases.length = 0
+      lastSevenNewCases.length = 0;
       for (let x = totalCases.length - 8; x <= totalCases.length - 2; x++) {
         lastSevenDaysDeaths.push(newDeaths[x]);
         lastSevenDaysActiveCases.push(newActiveCases[x]);
         lastSevenDaysRecovery.push(newRecovered[x]);
         lastSevenNewCases.push(newCases[x]);
+      }
+
+      antigenTestLastFourteendays.length = 0;
+      PCRTestLastFourteendays.length = 0;
+      for (let x = newPCRTest.length - 15; x <= newPCRTest.length - 2; x++) {
+        antigenTestLastFourteendays.push(newAntigenTest[x]);
+        PCRTestLastFourteendays.push(newPCRTest[x]);
       }
 
       const totalActiveData = {
@@ -199,34 +367,94 @@ export default function App() {
           {
             label: 'Active Cases',
             data: activeCases,
-            borderColor: 'rgb(255, 99, 132)',
-            backgroundColor: 'rgba(255, 99, 132, 0.5)',
+            borderColor: 'rgba(189, 65, 156, 1)',
+            backgroundColor: 'rgba(189, 65, 156, 0.5)',
           },
           {
             label: 'Total Cases',
             data: totalCases,
-            borderColor: 'rgb(53, 162, 235)',
-            backgroundColor: 'rgba(53, 162, 235, 0.5)',
+            borderColor: 'rgba(251, 171, 126)',
+            backgroundColor: 'rgba(251, 171, 126, 0.5)',
           },
         ],
       };
 
       setTotalActiveStatsForCharts(totalActiveData);
 
-      const allCovidDataForChart = {
-        labels: labels,
+      const totalRecoveredDeathsData = {
+        labels,
         datasets: [
           {
-            label: 'Active Cases',
-            data: activeCases,
-            borderColor: 'rgb(255, 99, 132)',
-            backgroundColor: 'rgba(255, 99, 132, 0.5)',
+            label: 'Recovered Cases',
+            data: totalRecovered,
+            borderColor: 'rgb(24, 165, 88)',
+            backgroundColor: 'rgba(24, 165, 88, 0.5)',
+          },
+          {
+            label: 'Total Deaths',
+            data: totalDeaths,
+            borderColor: 'rgb(199, 47, 50)',
+            backgroundColor: 'rgba(199, 47, 50, 0.5)',
+          },
+        ],
+      };
+
+      setTotalDeathRecoveredForCharts(totalRecoveredDeathsData);
+
+      const totalRecoveredTotalData = {
+        labels,
+        datasets: [
+          {
+            label: 'Recovered Cases',
+            data: totalRecovered,
+            borderColor: 'rgb(24, 165, 88)',
+            backgroundColor: 'rgba(24, 165, 88, 0.5)',
           },
           {
             label: 'Total Cases',
             data: totalCases,
-            borderColor: 'rgb(53, 162, 235)',
-            backgroundColor: 'rgba(53, 162, 235, 0.5)',
+            borderColor: 'rgba(251, 171, 126)',
+            backgroundColor: 'rgba(251, 171, 126, 0.5)',
+          },
+        ],
+      };
+
+      setTotalCasesRecoveredForCharts(totalRecoveredTotalData);
+
+      const totalActiveRecovered = {
+        labels,
+        datasets: [
+          {
+            label: 'Active Cases',
+            data: activeCases,
+            borderColor: 'rgba(189, 65, 156, 1)',
+            backgroundColor: 'rgba(189, 65, 156, 0.5)',
+          },
+          {
+            label: 'Recovered Cases',
+            data: totalRecovered,
+            borderColor: 'rgb(24, 165, 88)',
+            backgroundColor: 'rgba(24, 165, 88, 0.5)',
+          },
+        ],
+      };
+
+      setTotalActiveRecoveredForCharts(totalActiveRecovered);
+
+      const allCovidDataForChart = {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Total Cases',
+            data: totalCases,
+            borderColor: 'rgba(251, 171, 126)',
+            backgroundColor: 'rgba(251, 171, 126, 0.5)',
+          },
+          {
+            label: 'Total Recovered',
+            data: totalRecovered,
+            borderColor: 'rgb(24, 165, 88)',
+            backgroundColor: 'rgba(24, 165, 88, 0.5)',
           },
           {
             label: 'Total Death',
@@ -235,10 +463,10 @@ export default function App() {
             backgroundColor: 'rgba(199, 47, 50, 0.5)',
           },
           {
-            label: 'Total Recovered',
-            data: totalRecovered,
-            borderColor: 'rgb(24, 165, 88)',
-            backgroundColor: 'rgba(24, 165, 88, 0.5)',
+            label: 'Active Cases',
+            data: activeCases,
+            borderColor: 'rgba(189, 65, 156, 1)',
+            backgroundColor: 'rgba(189, 65, 156, 0.5)',
           }
         ],
       };
@@ -250,8 +478,17 @@ export default function App() {
         for (let x = 0; x <= 6; x++) {
           const date = moment().format("YYYY-MM-DD");
           const sevenDateBefore = moment(date).subtract(7, 'days').format("YYYY-MM-DD");
-          const newDate = moment(sevenDateBefore).add(x, 'days').format("YYYY-MM-DD")
+          const newDate = moment(sevenDateBefore).add(x, 'days').format("ddd, YYYY-MM-DD")
           labelss.push(String(newDate));
+          // console.log("New Date: " + newDate);
+        }
+
+        fourteenLabels.length = 0;
+        for (let x = 0; x <= 13; x++) {
+          const date = moment().format("YYYY-MM-DD");
+          const sevenDateBefore = moment(date).subtract(14, 'days').format("YYYY-MM-DD");
+          const newDate = moment(sevenDateBefore).add(x, 'days').format("ddd, YYYY-MM-DD")
+          fourteenLabels.push(String(newDate));
           // console.log("New Date: " + newDate);
         }
       } else {
@@ -261,6 +498,15 @@ export default function App() {
           const sevenDateBefore = moment(date).subtract(7, 'days').format("ddd, YYYY-MM-DD");
           const newDate = moment(sevenDateBefore).add(x, 'days').format("ddd, YYYY-MM-DD")
           labelss.push(String(newDate));
+          // console.log("New Date: " + newDate);
+        }
+
+        fourteenLabels.length = 0;
+        for (let x = 0; x <= 13; x++) {
+          const date = moment().format("ddd, YYYY-MM-DD");
+          const sevenDateBefore = moment(date).subtract(14, 'days').format("ddd, YYYY-MM-DD");
+          const newDate = moment(sevenDateBefore).add(x, 'days').format("ddd, YYYY-MM-DD")
+          fourteenLabels.push(String(newDate));
           // console.log("New Date: " + newDate);
         }
       }
@@ -273,19 +519,19 @@ export default function App() {
             label: 'Daily New Case(s)',
             data: lastSevenNewCases,
             borderColor: 'rgba(251, 171, 126, 0.7)',
-            backgroundColor: 'rgba(251, 171, 126, 0.5)',
+            backgroundColor: 'rgba(251, 171, 126, 1)',
           },
           {
             label: 'Daily New Death(s)',
             data: lastSevenDaysDeaths,
             borderColor: 'rgba(199, 47, 50, 0.7)',
-            backgroundColor: 'rgba(199, 47, 50, 0.5)',
+            backgroundColor: 'rgba(199, 47, 50, 1)',
           },
           {
             label: 'Daily New Recovered',
             data: lastSevenDaysRecovery,
             borderColor: 'rgba(24, 165, 88, 0.7)',
-            backgroundColor: 'rgba(24, 165, 88, 0.5)',
+            backgroundColor: 'rgba(24, 165, 88, 1)',
           },
 
         ],
@@ -330,7 +576,6 @@ export default function App() {
             borderColor: 'rgb(199, 47, 50)',
             backgroundColor: 'rgb(199, 47, 50)',
           },
-
         ],
       };
       setLastSevenDaysDeathsForCharts(dailyDeathStats);
@@ -348,6 +593,42 @@ export default function App() {
       };
       setYesterdayStatsForDoughnut(yesterdayStats);
 
+      const PCRAntigenStats = {
+        labels: fourteenLabels,
+        datasets: [
+          {
+            label: 'PCR Tests',
+            data: PCRTestLastFourteendays,
+            borderColor: 'rgb(252, 107, 25, 1)',
+            backgroundColor: 'rgba(251, 171, 126, 1)',
+          },
+          {
+            label: 'Rapid Antigen Tests',
+            data: antigenTestLastFourteendays,
+            borderColor: 'rgba(150, 174, 255, 1)',
+            backgroundColor: 'rgba(150, 174, 255, 1)',
+          }
+        ],
+      };
+
+      setPCRAntigenForCharts(PCRAntigenStats);
+
+      // setShowChangelog();
+      let showChangelog = false;
+
+      if (localStorage.getItem('covidstats') == null) {
+        showChangelog = true;
+      } else if (localStorage.getItem('covidstats') == "VXUeLc7R3mxB98QJZxzNNSHWX") {
+        showChangelog = false;
+        if (localStorage.getItem('@covidstats/wdr-frg') == null) {
+          setIsTourOpen(true);
+        }
+      } else {
+        showChangelog = true;
+      }
+
+      setIsModalVisible(showChangelog);
+      // setIsModalVisible(true)
       setDataLoaded(true);
     })
   }, [])
@@ -356,9 +637,16 @@ export default function App() {
   return (
     dataLoaded ?
       <>
-        <Modal title="Disclaimer" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
-          <p>The statistics that are being displayed in this dashboard are taken from Sri Lanka's Health Promotion Bureau (HPB). We, Win Innovative Solutions (Private) Limited, do not add modify the COVID-19 statistics displayed in this dashboard, nor do we take it from other sources apart from HPB as it'll be a conflict of the authenticity of the statistics.</p>
-          <p>For any concerns, please drop us an email at <a href="mailto:hello@winauthority.com?subject=COVID-19 Dashboard">hello@winauthority.com</a></p>
+        <Modal title="New improvements 🥳" icon={<InfoCircleOutlined />} visible={isModalVisible} onOk={handleOk} closable={false} centered={true} cancelButtonProps={{ style: { display: 'none' } }}>
+          <p>Hey there! Thank you for using our dashboard. We hope you and your family are safe from COVID-19!</p>
+          <p>We made a few improvements to make your experience while using this dashboard better. Please find the changelog below:</p>
+          <ul>
+            <li>We <b>added PCR and Rapid Antigen Statistics</b>. This will now show the last fourteen (14) days statistics.</li>
+            <li>We <b>changed the button to a toggle, which means now you can switch between daily statistics to total statistics through a toggle button</b> (you can view it on the top right corner).</li>
+            <li>We <b>changed the Statistics Of The Last Seven (7) Days</b> chart from a line chart to a bar chart for better viewing.</li>
+            <li>We <b>added more charts</b> to the total statistics section of the dashboard to give you a better understanding of the COVID-19 situation in our country.</li>
+          </ul>
+          <p>We hope you enjoy these new changes. If you have any concerns, please drop us an email at <a href="mailto:hello@winauthority.com?subject=COVID-19 Dashboard">hello@winauthority.com</a></p>
         </Modal>
         <div className="stats--container">
           <Row>
@@ -368,19 +656,22 @@ export default function App() {
                 title="COVID-19 Sri Lanka Statistics"
                 subTitle={`Last Updated: ${moment(currentCovidData.last_update).format('Do MMM YYYY, h:mm a')}`}
                 extra={[
-                  statType === "Daily Statistics" ? <>
-                    <Button key="3" onClick={() => setStatType("Daily Statistics")} type="primary">Daily Statistics</Button>
-                    <Button key="2" onClick={() => setStatType("Total Statistics")} >Total Statistics</Button></> :
-                    <>
-                      <Button key="3" onClick={() => setStatType("Daily Statistics")} >Daily Statistics</Button>
-                      <Button key="2" onClick={() => setStatType("Total Statistics")} type="primary">Total Statistics</Button>
-                    </>
+                  // statType === "Daily Statistics" ? <>
+                  //   <Button key="3" onClick={() => setStatType("Daily Statistics")} type="primary">Daily Statistics</Button>
+                  //   <Button key="2" onClick={() => setStatType("Total Statistics")} >Total Statistics</Button></> :
+                  //   <>
+                  //     <Button key="3" onClick={() => setStatType("Daily Statistics")} >Daily Statistics</Button>
+                  //     <Button key="2" onClick={() => setStatType("Total Statistics")} type="primary">Total Statistics</Button>
+                  //   </>
+
+
+                  <Switch className="toggleButton" checkedChildren="Daily Statistics" unCheckedChildren="Total Statistics" onChange={e => e ? setStatType("Daily Statistics") : setStatType("Total Statistics")} defaultChecked />
                 ]}
               />
             </Col>
           </Row>
           {statType === "Daily Statistics" ? <>
-            <Row justify="space-around" align="middle" className="daily--stats--row">
+            <Row justify="space-around latest-statistics-row" align="middle" className="daily--stats--row">
               <Col span={24} xs={24} md={24} lg={24}>
                 <Title level={2}>Latest statistics at a glance</Title>
                 <Popover content={"We are launching this feature soon. Stay tuned."}><Button type="primary" className="subscribe-button" shape="round">Subscribe for daily updates<BellOutlined /></Button></Popover>
@@ -409,15 +700,15 @@ export default function App() {
                 <Card>
                   <Title level={3} className="seven-days-graphs-title">Yesterday's Statistics, {moment().subtract(1, "day").format("Do MMM YYYY")}</Title>
                   <Col span={22} xs={24} lg={22} md={22} className="charts-wrapper">
-                    <Doughnut options={options} data={yesterdayStatsForDoughnut} />;
+                    <Doughnut options={donutChartsOptions} data={yesterdayStatsForDoughnut} />
                   </Col>
                 </Card>
               </Col>
               <Col className="gutter-row charts-container" align="middle" span={16} xs={24} lg={16} md={16}>
                 <Card>
-                  <Title level={3} className="seven-days-graphs-title">Statistics Of The Last Seven(7) Days</Title>
+                  <Title level={3} className="seven-days-graphs-title">Summary of The Last Seven(7) Day's Statistics</Title>
                   <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
-                    <Line options={options} data={dailyStatisticsForCharts} />;
+                    <Bar options={options} data={dailyStatisticsForCharts} />
                   </Col>
                 </Card>
               </Col>
@@ -430,7 +721,7 @@ export default function App() {
                 <Card>
                   <Title level={3} className="seven-days-graphs-title">Daily Cases</Title>
                   <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
-                    <Bar options={options} data={lastSevenDaysCases} />;
+                    <Bar options={options} data={lastSevenDaysCases} />
                   </Col>
                 </Card>
               </Col>
@@ -438,7 +729,7 @@ export default function App() {
                 <Card>
                   <Title level={3} className="seven-days-graphs-title">Daily Recoveries</Title>
                   <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
-                    <Bar options={options} data={lastSevenDaysRecovered} />;
+                    <Bar options={options} data={lastSevenDaysRecovered} />
                   </Col>
                 </Card>
               </Col>
@@ -446,14 +737,26 @@ export default function App() {
                 <Card>
                   <Title level={3} className="seven-days-graphs-title">Daily Deaths</Title>
                   <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
-                    <Bar options={options} data={lastSevenDaysDeathsForCharts} />;
+                    <Bar options={options} data={lastSevenDaysDeathsForCharts} />
+                  </Col>
+                </Card>
+              </Col>
+            </Row>
+            <Row>
+              <Col className="gutter-row" align="center" span={24} xs={24} lg={24} md={24}>
+                <Title level={3} className="seven-days-graphs-title">Last Fourteen (14) Days Investigations</Title>
+              </Col>
+              <Col className="gutter-row charts-container" align="middle" span={24} xs={24} lg={24} md={24}>
+                <Card>
+                  <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
+                    <Bar options={lineChartForPCRAntigen} data={PCRAntigenForCharts} />
                   </Col>
                 </Card>
               </Col>
             </Row>
           </>
             : <>
-              <Row justify="space-around" align="middle" className="stats--row">
+              <Row justify="space-around total-statistics-row" align="middle" className="stats--row">
                 <Col span={24} xs={24} md={24} lg={24}>
                   <Title level={2}>Total Statistics at a glance</Title>
                 </Col>
@@ -483,22 +786,47 @@ export default function App() {
                 </Col>
               </Row>
               <Row>
-                <Col className="gutter-row" align="middle" span={12} xs={24} lg={12} md={12}>
+                <Col className="gutter-row" align="middle" span={24} xs={24} lg={24} md={24}>
                   <Card title="Total Statistics as Graph">
                     <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
-                      <Line options={options} data={allDataForCharts} />;
+                      <Line options={lineChartOptions} data={allDataForCharts} />
                     </Col>
                   </Card>
                 </Col>
-                <Col className="gutter-row charts-wrapper" align="middle" span={12} xs={24} lg={12} md={12}>
+              </Row>
+              <Row>
+                <Col className="gutter-row" align="center" span={12} xs={24} lg={12} md={12}>
                   <Card title="Total vs Active Cases">
                     <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
-                      <Line options={options} data={totalActiveStatsForCharts} />;
+                      <Line options={lineChartOptions} data={totalActiveStatsForCharts} />
                     </Col>
                   </Card>
                 </Col>
-              </Row></>}
-
+                <Col className="gutter-row" align="center" span={12} xs={24} lg={12} md={12}>
+                  <Card title="Recovered vs Death Cases">
+                    <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
+                      <Line options={lineChartOptions} data={totalDeathRecoveredForCharts} />
+                    </Col>
+                  </Card>
+                </Col>
+              </Row>
+              <Row>
+                <Col className="gutter-row" align="center" span={12} xs={24} lg={12} md={12}>
+                  <Card title="Recovered vs Total Cases">
+                    <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
+                      <Line options={lineChartOptions} data={totalCasesRecoveredForCharts} />
+                    </Col>
+                  </Card>
+                </Col>
+                <Col className="gutter-row" align="center" span={12} xs={24} lg={12} md={12}>
+                  <Card title="Active vs Recovered Cases">
+                    <Col span={24} xs={24} lg={24} md={24} className="charts-wrapper">
+                      <Line options={lineChartOptions} data={totalActiveRecoveredForCharts} />
+                    </Col>
+                  </Card>
+                </Col>
+              </Row>
+            </>}
 
           <Footer>
             <Col className="gutter-row" span={24} xs={24} lg={24} md={24} style={{ textAlign: "center", bottom: 0, paddingTop: 30 }}>
@@ -506,7 +834,18 @@ export default function App() {
               <p className="footer-secondary-text">Data collected from Health Promotion Bureau, Sri Lanka | Got any suggestions or concerns? <a href={`https://www.winauthority.com/contact-us/?utm_source=covid-19-dashboard&utm_medium=footer-link&utm_campaign=covid-19-dashboard-footer`} target="_blank" rel="noreferrer">Contact us</a></p>
             </Col>
           </Footer>
-        </div></>
+        </div>
+
+        <Tour
+          steps={steps}
+          isOpen={isTourOpen}
+          onRequestClose={() => handleHide()}
+          disableKeyboardNavigation={true}
+          lastStepNextButton={<Button type="primary" onClick={() => setIsTourOpen(false)}>Hide</Button>}
+          accentColor="#96aeff"
+          showNavigation={false}
+        />
+      </>
       :
       <Row justify="space-around" align="middle" className="loader--container">
 
@@ -516,6 +855,7 @@ export default function App() {
           {/* <Title level={5}>Loading...</Title> */}
         </Col>
       </Row>
+
   )
 
 }
