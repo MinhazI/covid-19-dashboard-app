@@ -22,7 +22,7 @@ import {
 } from 'chart.js';
 import { Footer } from "antd/lib/layout/layout";
 import { isAndroid, isIOS } from "react-device-detect";
-import { BellOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { BellOutlined, InfoCircleOutlined, WhatsAppOutlined } from '@ant-design/icons';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { hotjar } from 'react-hotjar';
 import Tour from 'reactour'
@@ -223,11 +223,13 @@ export default function App() {
     localStorage.setItem('covidstats', "VXUeLc7R3mxB98QJZxzNNSHWX");
     setIsModalVisible(false);
     setIsTourOpen(true);
+    hotjar.event('new-feature-popup-hidden');
   };
 
   const handleHide = () => {
     localStorage.setItem('@covidstats/wdr-frg', 'hcSFHrPBQ8qs3BjE');
     setIsTourOpen(false);
+    hotjar.event('tour-hidden');
   }
 
   const handleCancel = () => {
@@ -675,6 +677,7 @@ export default function App() {
               <Col span={24} xs={24} md={24} lg={24}>
                 <Title level={2}>Latest statistics at a glance</Title>
                 <Popover content={"We are launching this feature soon. Stay tuned."}><Button type="primary" className="subscribe-button" shape="round">Subscribe for daily updates<BellOutlined /></Button></Popover>
+                {/* <Popover content={"Sharing to social media will be launched soon. Stay tuned."}><WhatsAppOutlined style={{color: "#ffffff", fontSize: "20px"}}/><FacebookOutlined /><InstagramOutlined style={{color: "#ffffff", fontSize: "20px"}}/></Popover> */}
               </Col>
               <Col className="gutter-row" span={6} xs={24} lg={7} md={8}>
                 <Card bordered={false} className="local-new-cases-wrapper">
